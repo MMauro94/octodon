@@ -16,6 +16,7 @@ kotlin {
         jvmToolchain(17)
     }
     sourceSets {
+        val ktorVersion = "2.3.1"
         val commonMain by getting {
             dependencies {
                 api(compose.runtime)
@@ -25,6 +26,13 @@ kotlin {
                 api(compose.materialIconsExtended)
 
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+                implementation("io.ktor:ktor-client-auth:$ktorVersion")
+                implementation("io.ktor:ktor-client-logging:$ktorVersion")
+                implementation("io.ktor:ktor-client-encoding:$ktorVersion")
             }
         }
         val commonTest by getting {

@@ -1,6 +1,8 @@
 package io.github.mmauro94.common
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Mail
@@ -17,6 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import io.github.mmauro94.common.Screens.HOME
+import io.github.mmauro94.common.client.LemmyClient
+import io.github.mmauro94.common.ui.Feed
 
 private enum class Screens(val icon: ImageVector) {
     HOME(Icons.Default.Home),
@@ -27,9 +32,14 @@ private enum class Screens(val icon: ImageVector) {
 
 @Composable
 fun App() {
-    var currentScreen by remember { mutableStateOf(Screens.HOME) }
+    var currentScreen by remember { mutableStateOf(HOME) }
+    val client = remember { LemmyClient("https://lemmy.ml/") }
     Column {
-        Text(currentScreen.name, Modifier.weight(1f))
+        when (currentScreen) {
+            HOME -> Feed(client = client, modifier = Modifier.weight(1f).fillMaxWidth())
+            else -> Spacer(Modifier.weight(1f))
+        }
+
         NavigationBar {
             Screens.values().forEach { screen ->
                 NavigationBarItem(

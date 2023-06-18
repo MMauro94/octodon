@@ -11,23 +11,24 @@ allprojects {
     }
 }
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("multiplatform") apply false
-    kotlin("android") apply false
-    id("com.android.application") apply false
-    id("com.android.library") apply false
-    id("org.jetbrains.compose") apply false
-    id("io.gitlab.arturbosch.detekt").version("1.23.0")
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.compose) apply false
+    alias(libs.plugins.detekt)
 }
 
 detekt {
-    toolVersion = "1.23.0"
+    toolVersion = libs.versions.detekt.get()
     config.setFrom(files("detekt.yml"))
     buildUponDefaultConfig = true
 }
 
 dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.0")
+    detektPlugins(libs.detekt.formatting)
 }
 
 tasks.withType<Detekt>().configureEach {

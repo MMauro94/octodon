@@ -1,8 +1,9 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.compose)
 }
 
 group = "io.github.mmauro94"

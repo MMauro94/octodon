@@ -1,10 +1,9 @@
-import org.jetbrains.compose.compose
-
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
-    id("com.android.library")
-    kotlin("plugin.serialization") version "1.8.20"
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.android.library)
 }
 
 group = "io.github.mmauro94"

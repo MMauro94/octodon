@@ -11,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.ApiResult.Error
 import io.github.mmauro94.common.client.ApiResult.Success
 import io.github.mmauro94.common.client.LemmyClient

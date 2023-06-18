@@ -7,7 +7,7 @@ sealed interface ApiResult<out R> {
     data class Success<R>(val result: R) : ApiResult<R>
 }
 
-@Suppress("FunctionNaming")
+@Suppress("FunctionNaming", "TooGenericExceptionCaught")
 inline fun <R> ApiResult(block: () -> R): ApiResult<R> {
     return try {
         ApiResult.Success(block())

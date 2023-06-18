@@ -15,6 +15,7 @@ kotlin {
     jvm("desktop") {
         jvmToolchain(17)
     }
+    @Suppress("UNUSED_VARIABLE")
     sourceSets {
         val ktorVersion = "2.3.1"
         val commonMain by getting {

@@ -6,7 +6,7 @@ import io.github.mmauro94.common.client.api.GetPostsItem
 
 @Composable
 fun Post(
-    post: GetPostsItem
+    post: GetPostsItem,
 ) {
     Text(post.post.name)
 }

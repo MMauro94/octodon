@@ -1,0 +1,54 @@
+complexity:
+  CyclomaticComplexMethod:
+    threshold: 30
+    ignoreSingleWhenExpression: true
+  LongMethod:
+    threshold: 200
+  LongParameterList:
+    ignoreDefaultParameters: true
+    ignoreAnnotated: ['Composable']
+
+empty-blocks:
+  EmptyFunctionBlock:
+    ignoreOverridden: true
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+
+formatting:
+  ArgumentListWrapping:
+    maxLineLength: 140 # Must also be changed in .editorconfig
+  FunctionSignature:
+    maxLineLength: 140 # Must also be changed in .editorconfig
+  MaximumLineLength:
+    maxLineLength: 140 # Must also be changed in .editorconfig
+  ParameterListWrapping:
+    maxLineLength: 140 # Must also be changed in .editorconfig
+  ImportOrdering:
+    # Must also be changed in .editorconfig
+    layout: "*,java.**,javax.**,kotlin.**,kotlinx.**,^"
+  NoWildcardImports:
+    # Must also be changed in .editorconfig
+    packagesToUseImportOnDemandProperty: "androidx.compose.**"
+  TrailingCommaOnCallSite:
+    active: true
+  TrailingCommaOnDeclarationSite:
+    active: true
+  UnnecessaryParenthesesBeforeTrailingLambda:
+    active: true
+
+style:
+  # UI has too many one-use numbers
+  MagicNumber:
+    active: false
+  MaxLineLength:  # Duplicate of ktlint MaximumLineLength
+    active: false
+  ForbiddenComment:
+    active: false # TODO (how ironic): re-enable once we're production ready
+  ReturnCount:
+    # There are quite a bit of legitimate cases where the default (2) is too restrictive
+    # Let's block only on a very high amount of returns
+    max: 7
+  WildcardImport: # Duplicate of ktlint NoWildcardImports
+    active: false

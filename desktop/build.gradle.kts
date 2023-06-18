@@ -13,6 +13,7 @@ kotlin {
         jvmToolchain(17)
         withJava()
     }
+    @Suppress("UNUSED_VARIABLE")
     sourceSets {
         val jvmMain by getting {
             dependencies {

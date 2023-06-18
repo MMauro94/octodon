@@ -21,13 +21,13 @@ plugins {
 }
 
 detekt {
-    toolVersion = "1.22.0"
+    toolVersion = "1.23.0"
     config.setFrom(files("detekt.yml"))
     buildUponDefaultConfig = true
 }
 
 dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.22.0")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.0")
 }
 
 tasks.withType<Detekt>().configureEach {

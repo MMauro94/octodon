@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import io.github.mmauro94.common.client.ApiResult.Error
 import io.github.mmauro94.common.client.ApiResult.Success
 import io.github.mmauro94.common.client.LemmyClient
-import io.github.mmauro94.common.client.api.GetPostsItem
 import io.github.mmauro94.common.client.api.getPosts
+import io.github.mmauro94.common.client.entities.Post
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 
@@ -31,7 +31,7 @@ sealed interface FeedState {
 }
 
 data class FeedInfo(
-    val posts: List<GetPostsItem>,
+    val posts: List<Post>,
     val state: FeedState,
 ) {
 

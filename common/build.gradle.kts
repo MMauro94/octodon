@@ -39,7 +39,9 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test"))
+                implementation(testLibs.kotest.assertions.core)
+                implementation(testLibs.kotest.framework.engine)
+                implementation(testLibs.kotest.framework.datatest)
             }
         }
         val androidMain by getting {
@@ -50,7 +52,7 @@ kotlin {
         }
         val androidUnitTest by getting {
             dependencies {
-                implementation("junit:junit:4.13.2")
+                implementation(testLibs.kotest.runner.junit5)
             }
         }
         val desktopMain by getting {
@@ -58,7 +60,11 @@ kotlin {
                 api(compose.preview)
             }
         }
-        val desktopTest by getting
+        val desktopTest by getting {
+            dependencies {
+                implementation(testLibs.kotest.runner.junit5)
+            }
+        }
     }
 }
 
@@ -73,4 +79,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     namespace = "io.github.mmauro94.common"
+}
+
+tasks.named<Test>("desktopTest") {
+    useJUnitPlatform()
 }

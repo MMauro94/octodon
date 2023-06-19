@@ -7,6 +7,14 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("testLibs") {
+            from(files("gradle/testLibs.versions.toml"))
+        }
+    }
+}
+
 rootProject.name = "octodon"
 
 include(":android", ":desktop", ":common")

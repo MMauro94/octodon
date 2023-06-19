@@ -35,4 +35,5 @@ android {
             isMinifyEnabled = false
         }
     }
+    namespace = "io.github.mmauro94.android"
 }

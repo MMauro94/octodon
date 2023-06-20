@@ -3,6 +3,12 @@ import io.gitlab.arturbosch.detekt.Detekt
 group = "io.github.mmauro94"
 version = "1.0-SNAPSHOT"
 
+buildscript {
+    dependencies {
+        classpath(libs.moko.resources.generator)
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -19,6 +25,7 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.compose) apply false
     alias(libs.plugins.detekt)
+    alias(libs.plugins.moko)
     alias(testLibs.plugins.kotest.multiplatform)
 }
 

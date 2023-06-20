@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.moko)
 }
 
 group = "io.github.mmauro94"
@@ -23,6 +24,8 @@ kotlin {
                 api(compose.material)
                 api(compose.material3)
                 api(compose.materialIconsExtended)
+                api(libs.moko.resources)
+                api(libs.moko.resources.compose)
 
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
@@ -43,6 +46,7 @@ kotlin {
                 implementation(testLibs.kotest.framework.datatest)
                 implementation(testLibs.mockk)
                 implementation(libs.ktor.client.mock)
+                api(libs.moko.resources.test)
             }
         }
         val androidMain by getting {
@@ -80,6 +84,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     namespace = "io.github.mmauro94.common"
+}
+
+multiplatformResources {
+    multiplatformResourcesPackage = "io.github.mmauro94.common"
 }
 
 tasks.named<Test>("desktopTest") {

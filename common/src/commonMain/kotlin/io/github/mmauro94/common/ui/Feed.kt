@@ -11,6 +11,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import dev.icerock.moko.resources.compose.stringResource
+import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.client.ApiResult.Error
 import io.github.mmauro94.common.client.ApiResult.Success
 import io.github.mmauro94.common.client.LemmyClient
@@ -63,6 +65,7 @@ fun Feed(
         }
     }
 
+    Text(stringResource(MR.strings.hello_world))
     LazyColumn(modifier) {
         items(feed.posts, key = { it.post.id }) { Post(it) }
         when (val state = feed.state) {

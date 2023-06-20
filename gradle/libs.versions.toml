@@ -4,6 +4,7 @@ compose = "1.4.0"
 detekt = "1.23.0"
 agp = "7.4.1"
 ktor = "2.3.1"
+moko = "0.23.0"
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -17,6 +18,11 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 
+moko-resources = { module = "dev.icerock.moko:resources", version.ref = "moko" }
+moko-resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko" }
+moko-resources-test = { module = "dev.icerock.moko:resources-test", version.ref = "moko" }
+moko-resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "moko" }
+
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -27,3 +33,5 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+
+moko = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "moko" }

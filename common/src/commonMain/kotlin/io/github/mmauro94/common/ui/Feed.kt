@@ -1,5 +1,6 @@
 package io.github.mmauro94.common.ui
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -11,8 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import dev.icerock.moko.resources.compose.stringResource
-import io.github.mmauro94.common.MR
+import androidx.compose.ui.unit.dp
 import io.github.mmauro94.common.client.ApiResult.Error
 import io.github.mmauro94.common.client.ApiResult.Success
 import io.github.mmauro94.common.client.LemmyClient
@@ -65,8 +65,7 @@ fun Feed(
         }
     }
 
-    Text(stringResource(MR.strings.hello_world))
-    LazyColumn(modifier) {
+    LazyColumn(modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
         items(feed.posts, key = { it.post.id }) { Post(it) }
         when (val state = feed.state) {
             is FeedState.Error -> item {

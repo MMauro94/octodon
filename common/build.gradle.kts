@@ -42,6 +42,7 @@ kotlin {
                 implementation(testLibs.kotest.assertions.core)
                 implementation(testLibs.kotest.framework.engine)
                 implementation(testLibs.kotest.framework.datatest)
+                implementation(testLibs.mockk)
                 implementation("io.ktor:ktor-client-mock:$ktorVersion")
             }
         }

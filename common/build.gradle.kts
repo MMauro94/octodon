@@ -16,7 +16,6 @@ kotlin {
     }
     @Suppress("UNUSED_VARIABLE")
     sourceSets {
-        val ktorVersion = "2.3.1"
         val commonMain by getting {
             dependencies {
                 api(compose.runtime)
@@ -26,15 +25,15 @@ kotlin {
                 api(compose.materialIconsExtended)
 
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-                implementation("io.ktor:ktor-client-core:$ktorVersion")
-                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-                implementation("io.ktor:ktor-client-auth:$ktorVersion")
-                implementation("io.ktor:ktor-client-logging:$ktorVersion")
-                implementation("io.ktor:ktor-client-encoding:$ktorVersion")
+
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.okhttp)
+                implementation(libs.ktor.client.auth)
+                implementation(libs.ktor.client.contentNegotiation)
+                implementation(libs.ktor.client.encoding)
+                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.serialization.kotlinx.json)
             }
         }
         val commonTest by getting {
@@ -43,7 +42,7 @@ kotlin {
                 implementation(testLibs.kotest.framework.engine)
                 implementation(testLibs.kotest.framework.datatest)
                 implementation(testLibs.mockk)
-                implementation("io.ktor:ktor-client-mock:$ktorVersion")
+                implementation(libs.ktor.client.mock)
             }
         }
         val androidMain by getting {

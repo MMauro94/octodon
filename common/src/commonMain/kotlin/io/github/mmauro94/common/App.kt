@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import io.github.mmauro94.common.Screens.HOME
 import io.github.mmauro94.common.client.LemmyClient
+import io.github.mmauro94.common.ui.AppTheme
 import io.github.mmauro94.common.ui.Feed
 
 private enum class Screens(val icon: ImageVector) {
@@ -40,6 +41,7 @@ fun App() {
     val client = remember { LemmyClient("https://lemmy.ml/") }
     MaterialTheme(
         colorScheme = darkColorScheme(),
+        shapes = AppTheme.shapes,
     ) {
         PlatformStyle {
             Surface(color = MaterialTheme.colorScheme.background) {

@@ -1,9 +1,13 @@
 package io.github.mmauro94.common.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.outlined.ModeComment
@@ -30,20 +35,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.seiko.imageloader.rememberAsyncImagePainter
 import io.github.mmauro94.common.client.entities.Community
 import io.github.mmauro94.common.client.entities.Post
+import io.github.mmauro94.common.client.entities.PostMediaInfo
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 
+private val LATERAL_PADDING = 8.dp
+
 @Composable
 fun Post(
     post: Post,
 ) {
-    Box(Modifier.padding(vertical = 4.dp)) {
+    Box(Modifier.padding(vertical = 6.dp)) {
         Surface(shadowElevation = 4.dp, tonalElevation = 4.dp) {
             Column(Modifier.padding(top = 8.dp)) {
                 PostHeader(post)
@@ -55,10 +66,8 @@ fun Post(
 }
 
 @Composable
-fun PostHeader(
-    post: Post,
-) {
-    Column(Modifier.padding(horizontal = 8.dp)) {
+fun PostHeader(post: Post) {
+    Column(Modifier.padding(horizontal = LATERAL_PADDING)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             CommunityInfo(post.community)
             var now by remember { mutableStateOf(Clock.System.now()) }
@@ -81,11 +90,38 @@ fun PostHeader(
             )
         }
         Spacer(Modifier.height(4.dp))
-        Text(
-            text = post.post.name,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 2,
-        )
+        Row {
+            Text(
+                text = post.post.name,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            if (post.post.url != null && post.post.mediaInfo == null) {
+                Spacer(Modifier.width(8.dp))
+                Surface(Modifier.size(64.dp), shape = MaterialTheme.shapes.medium) {
+                    if (post.post.thumbnailUrl != null) {
+                        val painter = rememberAsyncImagePainter(post.post.thumbnailUrl)
+                        Image(
+                            painter = painter,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.Crop,
+                        )
+                    } else {
+                        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) {
+                            Icon(
+                                imageVector = Icons.Default.Link,
+                                contentDescription = null,
+                                modifier = Modifier.align(Alignment.Center).size(32.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariantLowlighted,
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -99,18 +135,36 @@ fun CommunityInfo(
         maxLines = 1,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.secondary,
+        overflow = TextOverflow.Ellipsis,
     )
 }
 
 @Composable
-fun PostContent(post: Post) {
+fun ColumnScope.PostContent(post: Post) {
+    when (val mediaInfo = post.post.mediaInfo) {
+        null -> {}
+        is PostMediaInfo.Image -> {
+            Spacer(Modifier.height(16.dp))
+            val painter = rememberAsyncImagePainter(mediaInfo.thumbnailUrl)
+            // TODO handle image loading (now height is at 0)
+            // TODO handle image download errors
+            // TODO seems to not work with webp
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth,
+            )
+        }
+    }
     if (post.post.body != null) {
+        Spacer(Modifier.height(8.dp))
         Surface(
-            modifier = Modifier.padding(horizontal = 8.dp).padding(top = 4.dp).fillMaxWidth(),
+            modifier = Modifier.padding(horizontal = LATERAL_PADDING).padding(top = 4.dp).fillMaxWidth(),
             color = MaterialTheme.colorScheme.surfaceVariant,
             shape = MaterialTheme.shapes.medium,
         ) {
-            Box(Modifier.padding(4.dp)) {
+            Box(Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
                 PostBody(
                     body = post.post.body,
                     maxLines = 4,
@@ -154,12 +208,12 @@ private fun FooterIcon(
     icon: ImageVector,
     contentDescription: String,
 ) {
-    IconButton(onClick = onClick, modifier = Modifier.size(40.dp)) {
+    IconButton(onClick = onClick, modifier = Modifier.size(44.dp)) {
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
             tint = MaterialTheme.colorScheme.onSurfaceLowlighted,
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(22.dp),
         )
     }
 }

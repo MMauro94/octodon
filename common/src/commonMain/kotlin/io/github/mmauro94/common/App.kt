@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.seiko.imageloader.LocalImageLoader
 import io.github.mmauro94.common.Screens.HOME
 import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.ui.AppTheme
@@ -37,34 +39,42 @@ private enum class Screens(val icon: ImageVector) {
 
 @Composable
 fun App() {
-    var currentScreen by remember { mutableStateOf(HOME) }
-    val client = remember { LemmyClient("https://lemmy.ml/") }
     MaterialTheme(
         colorScheme = darkColorScheme(),
         shapes = AppTheme.shapes,
     ) {
         PlatformStyle {
-            Surface(color = MaterialTheme.colorScheme.background) {
-                Column {
-                    when (currentScreen) {
-                        HOME -> Feed(client = client, modifier = Modifier.weight(1f).fillMaxWidth())
-                        else -> Spacer(Modifier.weight(1f))
-                    }
-
-                    NavigationBar(tonalElevation = 8.dp) {
-                        Screens.values().forEach { screen ->
-                            NavigationBarItem(
-                                selected = screen == currentScreen,
-                                icon = { Icon(screen.icon, null) },
-                                label = { Text(screen.name.lowercase().replaceFirstChar { it.uppercase() }) },
-                                onClick = {
-                                    currentScreen = screen
-                                },
-                                alwaysShowLabel = false,
-                            )
-                        }
-                    }
+            CompositionLocalProvider(LocalImageLoader provides generateImageLoader()) {
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    AppContent()
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppContent() {
+    var currentScreen by remember { mutableStateOf(HOME) }
+    val client = remember { LemmyClient("https://lemmy.ml/") }
+
+    Column {
+        when (currentScreen) {
+            HOME -> Feed(client = client, modifier = Modifier.weight(1f).fillMaxWidth())
+            else -> Spacer(Modifier.weight(1f))
+        }
+
+        NavigationBar(tonalElevation = 8.dp) {
+            Screens.values().forEach { screen ->
+                NavigationBarItem(
+                    selected = screen == currentScreen,
+                    icon = { Icon(screen.icon, null) },
+                    label = { Text(screen.name.lowercase().replaceFirstChar { it.uppercase() }) },
+                    onClick = {
+                        currentScreen = screen
+                    },
+                    alwaysShowLabel = false,
+                )
             }
         }
     }

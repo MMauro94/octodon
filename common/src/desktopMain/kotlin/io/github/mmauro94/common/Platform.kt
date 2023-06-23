@@ -12,6 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import com.seiko.imageloader.ImageLoader
+import com.seiko.imageloader.cache.memory.maxSizePercent
+import com.seiko.imageloader.component.setupDefaultComponents
+import net.harawata.appdirs.AppDirsFactory
+import okio.Path.Companion.toOkioPath
+import java.io.File
 
 actual fun getPlatformName(): String {
     return "Desktop"
@@ -42,3 +48,27 @@ actual fun PlatformVerticalScrollbar(
         interactionSource = interactionSource,
     )
 }
+
+@Composable
+actual fun generateImageLoader(): ImageLoader {
+    return ImageLoader {
+        components {
+            setupDefaultComponents()
+        }
+        interceptor {
+            memoryCacheConfig {
+                maxSizePercent(percent = 0.25)
+            }
+            diskCacheConfig {
+                val imagesCache = File(
+                    AppDirsFactory.getInstance().getUserCacheDir("octodon", null, null),
+                    "images",
+                )
+                imagesCache.parentFile.mkdirs()
+                directory(imagesCache.toOkioPath())
+                maxSizeBytes(512L * 1024 * 1024)
+            }
+        }
+    }
+}
+

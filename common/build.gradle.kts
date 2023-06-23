@@ -37,6 +37,8 @@ kotlin {
                 implementation(libs.ktor.client.encoding)
                 implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.serialization.kotlinx.json)
+
+                implementation(libs.imageLoader)
             }
         }
         val commonTest by getting {
@@ -63,6 +65,7 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 api(compose.preview)
+                implementation("net.harawata:appdirs:1.2.1")
             }
         }
         val desktopTest by getting {

@@ -17,5 +17,10 @@ object AppTheme {
     )
 }
 
+private const val LOWLIGHTED_ALPHA = .6f
+
 val ColorScheme.onSurfaceLowlighted: Color
-    get() = this.onSurface.copy(alpha = .6f)
+    get() = this.onSurface.copy(alpha = LOWLIGHTED_ALPHA)
+
+val ColorScheme.onSurfaceVariantLowlighted: Color
+    get() = this.onSurfaceVariant.copy(alpha = LOWLIGHTED_ALPHA)

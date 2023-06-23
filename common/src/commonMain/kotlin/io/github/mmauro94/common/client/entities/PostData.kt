@@ -6,6 +6,7 @@ import io.github.mmauro94.common.serializers.InstantSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 
 @Serializable
@@ -31,4 +32,29 @@ data class PostData(
     @SerialName("language_id") val languageId: Int,
     @SerialName("featured_community") val featuredCommunity: Boolean,
     @SerialName("featured_local") val featuredLocal: Boolean,
-)
+) {
+
+    @Transient
+    val mediaInfo: PostMediaInfo? = run {
+        if (thumbnailUrl != null && url != null && IMAGE_EXTENSIONS.any { ext -> url.endsWith(".$ext") }) {
+            PostMediaInfo.Image(
+                imageUrl = url,
+                thumbnailUrl = thumbnailUrl,
+            )
+        } else {
+            null
+        }
+    }
+
+    companion object {
+        private val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "tiff", "tif", "bmp")
+    }
+}
+
+sealed interface PostMediaInfo {
+
+    data class Image(
+        val imageUrl: String,
+        val thumbnailUrl: String,
+    ) : PostMediaInfo
+}

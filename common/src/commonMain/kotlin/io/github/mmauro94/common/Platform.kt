@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.seiko.imageloader.ImageLoader
 
 expect fun getPlatformName(): String
 
@@ -18,3 +19,6 @@ expect fun PlatformVerticalScrollbar(
     reverseLayout: Boolean = false,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 )
+
+@Composable
+expect fun generateImageLoader(): ImageLoader

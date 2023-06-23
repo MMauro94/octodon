@@ -7,13 +7,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.outlined.ModeComment
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.mmauro94.common.client.entities.Community
 import io.github.mmauro94.common.client.entities.Post
@@ -44,7 +48,7 @@ fun Post(
             Column(Modifier.padding(top = 8.dp)) {
                 PostHeader(post)
                 PostContent(post)
-                PostFooter()
+                PostFooter(post)
             }
         }
     }
@@ -64,22 +68,24 @@ fun PostHeader(
                     delay(1.seconds)
                 }
             }
+            Text(
+                text = "•",
+                modifier = Modifier.padding(horizontal = 2.dp),
+                color = MaterialTheme.colorScheme.onSurfaceLowlighted,
+            )
             val duration = (now - post.post.published).inWholeMinutes.minutes
-            Text(duration.toString(), style = MaterialTheme.typography.labelMedium)
-        }
-        Spacer(Modifier.height(4.dp))
-        Text(post.post.name, style = MaterialTheme.typography.titleMedium, maxLines = 2)
-        Spacer(Modifier.height(4.dp))
-        Row {
             Text(
-                text = (post.counts.upvotes - post.counts.downvotes).toString(),
-                style = MaterialTheme.typography.labelLarge,
-            )
-            Text(
-                text = "${post.counts.comments} comments",
-                style = MaterialTheme.typography.labelLarge,
+                text = duration.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceLowlighted,
             )
         }
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = post.post.name,
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 2,
+        )
     }
 }
 
@@ -87,7 +93,13 @@ fun PostHeader(
 fun CommunityInfo(
     community: Community,
 ) {
-    Text(community.name, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+    Text(
+        text = community.name,
+        style = MaterialTheme.typography.labelMedium,
+        maxLines = 1,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.secondary,
+    )
 }
 
 @Composable
@@ -109,25 +121,45 @@ fun PostContent(post: Post) {
 }
 
 @Composable
-fun PostFooter() {
-    Row {
-        IconButton({}, Modifier.weight(1f)) {
-            Icon(Icons.Default.ArrowUpward, "upvote")
+fun PostFooter(post: Post) {
+    val color = MaterialTheme.colorScheme.onSurfaceLowlighted
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Outlined.ModeComment, contentDescription = "comments", tint = color, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = "${post.counts.comments} comments",
+                style = MaterialTheme.typography.labelLarge,
+                color = color,
+            )
         }
-        IconButton({}, Modifier.weight(1f)) {
-            Icon(Icons.Default.ArrowDownward, "downvote")
-        }
-        IconButton({}, Modifier.weight(1f)) {
-            Icon(Icons.Default.BookmarkBorder, "save")
-        }
-        IconButton({}, Modifier.weight(1f)) {
-            Icon(Icons.Default.Comment, "open comments")
-        }
-        IconButton({}, Modifier.weight(1f)) {
-            Icon(Icons.Default.OpenInNew, "open link")
-        }
-        IconButton({}, Modifier.weight(1f)) {
-            Icon(Icons.Default.MoreVert, "options")
-        }
+
+        Spacer(Modifier.weight(1f))
+        FooterIcon({}, icon = Icons.Default.ArrowUpward, contentDescription = "upvote")
+        Text(
+            text = (post.counts.upvotes - post.counts.downvotes).toString(),
+            style = MaterialTheme.typography.labelLarge,
+            color = color,
+        )
+        FooterIcon({}, icon = Icons.Default.ArrowDownward, contentDescription = "downvote")
+        FooterIcon({}, icon = Icons.Default.BookmarkBorder, contentDescription = "save")
+        FooterIcon({}, icon = Icons.Default.OpenInBrowser, contentDescription = "open link")
+        FooterIcon({}, icon = Icons.Default.MoreVert, contentDescription = "options")
+    }
+}
+
+@Composable
+private fun FooterIcon(
+    onClick: () -> Unit,
+    icon: ImageVector,
+    contentDescription: String,
+) {
+    IconButton(onClick = onClick, modifier = Modifier.size(40.dp)) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = MaterialTheme.colorScheme.onSurfaceLowlighted,
+            modifier = Modifier.size(20.dp),
+        )
     }
 }

@@ -1,7 +1,9 @@
 package io.github.mmauro94.common.ui
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Shapes
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 object AppTheme {
@@ -14,3 +16,6 @@ object AppTheme {
         extraLarge = RoundedCornerShape(12.dp),
     )
 }
+
+val ColorScheme.onSurfaceLowlighted: Color
+    get() = this.onSurface.copy(alpha = .6f)

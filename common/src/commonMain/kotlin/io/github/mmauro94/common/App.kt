@@ -14,7 +14,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -40,7 +39,7 @@ private enum class Screens(val icon: ImageVector) {
 @Composable
 fun App() {
     MaterialTheme(
-        colorScheme = darkColorScheme(),
+        colorScheme = appColorScheme(),
         shapes = AppTheme.shapes,
     ) {
         PlatformStyle {

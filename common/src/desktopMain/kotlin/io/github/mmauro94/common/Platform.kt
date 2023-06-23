@@ -6,6 +6,8 @@ import androidx.compose.foundation.defaultScrollbarStyle
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -72,3 +74,7 @@ actual fun generateImageLoader(): ImageLoader {
     }
 }
 
+@Composable
+actual fun appColorScheme(): ColorScheme {
+    return darkColorScheme()
+}

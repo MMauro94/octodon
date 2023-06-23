@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -42,6 +43,7 @@ fun Post(
         Surface(shadowElevation = 4.dp, tonalElevation = 4.dp) {
             Column(Modifier.padding(top = 8.dp)) {
                 PostHeader(post)
+                PostContent(post)
                 PostFooter()
             }
         }
@@ -86,6 +88,24 @@ fun CommunityInfo(
     community: Community,
 ) {
     Text(community.name, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+}
+
+@Composable
+fun PostContent(post: Post) {
+    if (post.post.body != null) {
+        Surface(
+            modifier = Modifier.padding(horizontal = 8.dp).padding(top = 4.dp).fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            shape = MaterialTheme.shapes.medium,
+        ) {
+            Box(Modifier.padding(4.dp)) {
+                PostBody(
+                    body = post.post.body,
+                    maxLines = 4,
+                )
+            }
+        }
+    }
 }
 
 @Composable

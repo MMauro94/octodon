@@ -1,7 +1,11 @@
 package io.github.mmauro94.common
 
+import android.os.Build
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -43,5 +47,15 @@ actual fun generateImageLoader(): ImageLoader {
                 maxSizeBytes(512L * 1024 * 1024)
             }
         }
+    }
+}
+
+@Composable
+actual fun appColorScheme(): ColorScheme {
+    val dynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    return if (dynamicColor) {
+        dynamicDarkColorScheme(LocalContext.current)
+    } else {
+        darkColorScheme()
     }
 }

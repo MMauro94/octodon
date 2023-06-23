@@ -9,6 +9,7 @@ import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 class LemmyClient(
@@ -25,6 +26,7 @@ class LemmyClient(
         },
     )
 
+    @OptIn(ExperimentalSerializationApi::class)
     val ktorClient by lazy {
         HttpClient(engineFactory) {
             expectSuccess = true
@@ -40,6 +42,7 @@ class LemmyClient(
                     Json {
                         encodeDefaults = true
                         ignoreUnknownKeys = true
+                        explicitNulls = false
                     },
                 )
             }

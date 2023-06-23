@@ -1,9 +1,13 @@
 package io.github.mmauro94.common.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -14,8 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.mmauro94.common.PlatformVerticalScrollbar
 import io.github.mmauro94.common.client.ApiResult.Error
 import io.github.mmauro94.common.client.ApiResult.Success
 import io.github.mmauro94.common.client.LemmyClient
@@ -63,6 +69,7 @@ fun Feed(
     val cs = rememberCoroutineScope()
     var feed by remember(client, communityId) { mutableStateOf(FeedInfo.DEFAULT) }
     val channel = remember(client, communityId) { Channel<Int>(Channel.CONFLATED) }
+    val lazyColumnState = rememberLazyListState()
     LaunchedEffect(client, communityId) {
         for (page in channel) {
             feed = feed.copy(state = FeedState.Loading(nextPage = page))
@@ -87,32 +94,38 @@ fun Feed(
             }
         }
     }
-
-    LazyColumn(modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
-        items(feed.posts) { Post(it) }
-        when (val state = feed.state) {
-            is FeedState.Error -> item {
-                Column {
-                    Text(state.message)
-                    Button(
-                        onClick = { cs.launch { channel.send(state.nextPage) } },
-                    ) {
-                        Text("Retry")
+    Box(modifier) {
+        LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp), state = lazyColumnState) {
+            items(feed.posts) { Post(it) }
+            when (val state = feed.state) {
+                is FeedState.Error -> item {
+                    Column {
+                        Text(state.message)
+                        Button(
+                            onClick = { cs.launch { channel.send(state.nextPage) } },
+                        ) {
+                            Text("Retry")
+                        }
                     }
                 }
-            }
 
-            is FeedState.Loading -> item {
-                CircularProgressIndicator()
-            }
-
-            is FeedState.Resting -> item {
-                LaunchedEffect(Unit) {
-                    channel.send(state.nextPage)
+                is FeedState.Loading -> item {
+                    CircularProgressIndicator()
                 }
-            }
 
-            FeedState.Finished -> {}
+                is FeedState.Resting -> item {
+                    LaunchedEffect(Unit) {
+                        channel.send(state.nextPage)
+                    }
+                }
+
+                FeedState.Finished -> {}
+            }
         }
+
+        PlatformVerticalScrollbar(
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            listState = lazyColumnState,
+        )
     }
 }

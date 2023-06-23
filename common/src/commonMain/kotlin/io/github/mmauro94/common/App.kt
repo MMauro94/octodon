@@ -41,24 +41,26 @@ fun App() {
     MaterialTheme(
         colorScheme = darkColorScheme(),
     ) {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            Column {
-                when (currentScreen) {
-                    HOME -> Feed(client = client, modifier = Modifier.weight(1f).fillMaxWidth())
-                    else -> Spacer(Modifier.weight(1f))
-                }
+        PlatformStyle {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Column {
+                    when (currentScreen) {
+                        HOME -> Feed(client = client, modifier = Modifier.weight(1f).fillMaxWidth())
+                        else -> Spacer(Modifier.weight(1f))
+                    }
 
-                NavigationBar(tonalElevation = 8.dp) {
-                    Screens.values().forEach { screen ->
-                        NavigationBarItem(
-                            selected = screen == currentScreen,
-                            icon = { Icon(screen.icon, null) },
-                            label = { Text(screen.name.lowercase().replaceFirstChar { it.uppercase() }) },
-                            onClick = {
-                                currentScreen = screen
-                            },
-                            alwaysShowLabel = false,
-                        )
+                    NavigationBar(tonalElevation = 8.dp) {
+                        Screens.values().forEach { screen ->
+                            NavigationBarItem(
+                                selected = screen == currentScreen,
+                                icon = { Icon(screen.icon, null) },
+                                label = { Text(screen.name.lowercase().replaceFirstChar { it.uppercase() }) },
+                                onClick = {
+                                    currentScreen = screen
+                                },
+                                alwaysShowLabel = false,
+                            )
+                        }
                     }
                 }
             }

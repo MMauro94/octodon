@@ -3,18 +3,17 @@ package io.github.mmauro94.common.client.api
 import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.client.entities.ListingType
-import io.github.mmauro94.common.client.entities.Post
+import io.github.mmauro94.common.client.entities.PostView
 import io.github.mmauro94.common.client.entities.SortType
 import io.github.mmauro94.common.utils.serialName
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 
 @Serializable
 private data class GetPostsBody(
-    val posts: List<Post>,
+    val posts: List<PostView>,
 )
 
 suspend fun LemmyClient.getPosts(
@@ -24,7 +23,7 @@ suspend fun LemmyClient.getPosts(
     sort: SortType? = null,
     type: ListingType? = null,
     savedOnly: Boolean? = null,
-): ApiResult<List<Post>> {
+): ApiResult<List<PostView>> {
     return ApiResult {
         ktorClient.get("post/list") {
             parameter("community_id", communityId)

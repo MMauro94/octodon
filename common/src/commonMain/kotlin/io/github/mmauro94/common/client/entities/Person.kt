@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
-data class User(
+data class Person(
     val id: Long,
     val name: String,
     @SerialName("display_name") val displayName: String?,

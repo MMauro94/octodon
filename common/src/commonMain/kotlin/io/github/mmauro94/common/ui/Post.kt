@@ -41,7 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberAsyncImagePainter
 import io.github.mmauro94.common.client.entities.Community
-import io.github.mmauro94.common.client.entities.Post
+import io.github.mmauro94.common.client.entities.PostView
 import io.github.mmauro94.common.client.entities.PostMediaInfo
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -52,24 +52,24 @@ private val LATERAL_PADDING = 8.dp
 
 @Composable
 fun Post(
-    post: Post,
+    postView: PostView,
 ) {
     Box(Modifier.padding(vertical = 6.dp)) {
         Surface(shadowElevation = 4.dp, tonalElevation = 4.dp) {
             Column(Modifier.padding(top = 8.dp)) {
-                PostHeader(post)
-                PostContent(post)
-                PostFooter(post)
+                PostHeader(postView)
+                PostContent(postView)
+                PostFooter(postView)
             }
         }
     }
 }
 
 @Composable
-fun PostHeader(post: Post) {
+fun PostHeader(postView: PostView) {
     Column(Modifier.padding(horizontal = LATERAL_PADDING)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            CommunityInfo(post.community)
+            CommunityInfo(postView.community)
             var now by remember { mutableStateOf(Clock.System.now()) }
             LaunchedEffect(Unit) {
                 while (true) {
@@ -82,7 +82,7 @@ fun PostHeader(post: Post) {
                 modifier = Modifier.padding(horizontal = 2.dp),
                 color = MaterialTheme.colorScheme.onSurfaceLowlighted,
             )
-            val duration = (now - post.post.published).inWholeMinutes.minutes
+            val duration = (now - postView.post.published).inWholeMinutes.minutes
             Text(
                 text = duration.toString(),
                 style = MaterialTheme.typography.labelMedium,
@@ -92,17 +92,17 @@ fun PostHeader(post: Post) {
         Spacer(Modifier.height(4.dp))
         Row {
             Text(
-                text = post.post.name,
+                text = postView.post.name,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
-            if (post.post.url != null && post.post.mediaInfo == null) {
+            if (postView.post.url != null && postView.post.mediaInfo == null) {
                 Spacer(Modifier.width(8.dp))
                 Surface(Modifier.size(64.dp), shape = MaterialTheme.shapes.medium) {
-                    if (post.post.thumbnailUrl != null) {
-                        val painter = rememberAsyncImagePainter(post.post.thumbnailUrl)
+                    if (postView.post.thumbnailUrl != null) {
+                        val painter = rememberAsyncImagePainter(postView.post.thumbnailUrl)
                         Image(
                             painter = painter,
                             contentDescription = null,
@@ -140,8 +140,8 @@ fun CommunityInfo(
 }
 
 @Composable
-fun ColumnScope.PostContent(post: Post) {
-    when (val mediaInfo = post.post.mediaInfo) {
+fun ColumnScope.PostContent(postView: PostView) {
+    when (val mediaInfo = postView.post.mediaInfo) {
         null -> {}
         is PostMediaInfo.Image -> {
             Spacer(Modifier.height(16.dp))
@@ -157,7 +157,7 @@ fun ColumnScope.PostContent(post: Post) {
             )
         }
     }
-    if (post.post.body != null) {
+    if (postView.post.body != null) {
         Spacer(Modifier.height(8.dp))
         Surface(
             modifier = Modifier.padding(horizontal = LATERAL_PADDING).padding(top = 4.dp).fillMaxWidth(),
@@ -166,7 +166,7 @@ fun ColumnScope.PostContent(post: Post) {
         ) {
             Box(Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
                 PostBody(
-                    body = post.post.body,
+                    body = postView.post.body,
                     maxLines = 4,
                 )
             }
@@ -175,14 +175,14 @@ fun ColumnScope.PostContent(post: Post) {
 }
 
 @Composable
-fun PostFooter(post: Post) {
+fun PostFooter(postView: PostView) {
     val color = MaterialTheme.colorScheme.onSurfaceLowlighted
     Row(verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Outlined.ModeComment, contentDescription = "comments", tint = color, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(4.dp))
             Text(
-                text = "${post.counts.comments} comments",
+                text = "${postView.counts.comments} comments",
                 style = MaterialTheme.typography.labelLarge,
                 color = color,
             )
@@ -191,7 +191,7 @@ fun PostFooter(post: Post) {
         Spacer(Modifier.weight(1f))
         FooterIcon({}, icon = Icons.Default.ArrowUpward, contentDescription = "upvote")
         Text(
-            text = (post.counts.upvotes - post.counts.downvotes).toString(),
+            text = (postView.counts.upvotes - postView.counts.downvotes).toString(),
             style = MaterialTheme.typography.labelLarge,
             color = color,
         )

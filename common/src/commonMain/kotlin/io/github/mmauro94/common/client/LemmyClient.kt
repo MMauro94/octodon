@@ -34,7 +34,7 @@ class LemmyClient(
         HttpClient(engineFactory) {
             expectSuccess = true
             defaultRequest {
-                url(this@LemmyClient.url + "api/v3/")
+                url(this@LemmyClient.url.removeSuffix("/") + "/api/v3/")
             }
             install(ContentEncoding) {
                 deflate(1.0f)

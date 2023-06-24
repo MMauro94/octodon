@@ -63,7 +63,7 @@ actual fun generateImageLoader(): ImageLoader {
             }
             diskCacheConfig {
                 val imagesCache = File(
-                    AppDirsFactory.getInstance().getUserCacheDir("octodon", null, null),
+                    AppDirsFactory.getInstance().getUserCacheDir(APP_DIR_NAME, null, null),
                     "images",
                 )
                 imagesCache.parentFile.mkdirs()

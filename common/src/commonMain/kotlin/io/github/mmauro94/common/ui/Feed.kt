@@ -26,7 +26,7 @@ import io.github.mmauro94.common.client.ApiResult.Error
 import io.github.mmauro94.common.client.ApiResult.Success
 import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.client.api.getPosts
-import io.github.mmauro94.common.client.entities.Post
+import io.github.mmauro94.common.client.entities.PostView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -48,13 +48,13 @@ sealed interface FeedState {
 }
 
 data class FeedInfo(
-    val posts: List<Post>,
+    val postViews: List<PostView>,
     val state: FeedState,
 ) {
 
     companion object {
         val DEFAULT = FeedInfo(
-            posts = emptyList(),
+            postViews = emptyList(),
             state = FeedState.Resting(1),
         )
     }
@@ -85,7 +85,7 @@ fun Feed(
                 )
 
                 is Success -> feed.copy(
-                    posts = feed.posts + posts.result,
+                    postViews = feed.postViews + posts.result,
                     state = when {
                         posts.result.isEmpty() -> FeedState.Finished
                         else -> FeedState.Resting(nextPage = page + 1)
@@ -97,7 +97,7 @@ fun Feed(
     Box(modifier) {
         // TODO empty feed view
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp), state = lazyColumnState) {
-            items(feed.posts) { Post(it) }
+            items(feed.postViews) { Post(it) }
             when (val state = feed.state) {
                 is FeedState.Error -> item {
                     Column {

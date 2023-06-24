@@ -12,6 +12,9 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
+/**
+ * For list of types [https://join-lemmy.org/api/modules.html](https://join-lemmy.org/api/modules.html)
+ */
 class LemmyClient(
     val url: String,
     engineFactory: HttpClientEngineFactory<*> = OkHttp,

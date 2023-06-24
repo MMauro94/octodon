@@ -6,38 +6,55 @@ import io.github.mmauro94.common.serializers.InstantSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class Post(
-    val post: PostData,
-    val creator: User,
-    val community: Community,
-    @SerialName("creator_banned_from_community") val creatorBannedFromCommunity: Boolean,
-    val counts: Counts,
-    val subscribed: SubscribedType,
-    val saved: Boolean,
-    val read: Boolean,
-    @SerialName("creator_blocked") val creatorBlocked: Boolean,
-    // TODO @SerialName("my_vote") val myVote: ???,
-    // TODO @SerialName("my_vote") val myVote: ???,
-    @SerialName("unread_comments") val unreadComments: Int,
+    val id: Long,
+    val name: String,
+    val url: String?,
+    val body: String?,
+    @SerialName("creator_id") val creatorId: Long,
+    @SerialName("community_id") val communityId: Long,
+    val removed: Boolean,
+    val locked: Boolean,
+    val published: Instant,
+    val updated: Instant?,
+    val deleted: Boolean,
+    val nsfw: Boolean,
+    @SerialName("embed_title") val embedTitle: String?,
+    @SerialName("embed_description") val embedDescription: String?,
+    @SerialName("embed_video_url") val embedVideoUrl: String?,
+    @SerialName("thumbnail_url") val thumbnailUrl: String?,
+    @SerialName("ap_id") val apId: String?,
+    val local: Boolean,
+    @SerialName("language_id") val languageId: Int,
+    @SerialName("featured_community") val featuredCommunity: Boolean,
+    @SerialName("featured_local") val featuredLocal: Boolean,
 ) {
 
-    @Serializable
-    data class Counts(
-        val id: Long,
-        @SerialName("post_id") val postId: Long,
-        val comments: Int,
-        val score: Int,
-        val upvotes: Int,
-        val downvotes: Int,
-        val published: Instant,
-        @SerialName("newest_comment_time_necro") val newestCommentTimeNecro: Instant?,
-        @SerialName("newest_comment_time") val newestCommentTime: Instant?,
-        @SerialName("featured_community") val featuredCommunity: Boolean,
-        @SerialName("featured_local") val featuredLocal: Boolean,
-        @SerialName("hot_rank") val hotRank: Int,
-        @SerialName("hot_rank_active") val hotRankActive: Int,
-    )
+    @Transient
+    val mediaInfo: PostMediaInfo? = run {
+        if (thumbnailUrl != null && url != null && IMAGE_EXTENSIONS.any { ext -> url.endsWith(".$ext") }) {
+            PostMediaInfo.Image(
+                imageUrl = url,
+                thumbnailUrl = thumbnailUrl,
+            )
+        } else {
+            null
+        }
+    }
+
+    companion object {
+        private val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "tiff", "tif", "bmp")
+    }
+}
+
+sealed interface PostMediaInfo {
+
+    data class Image(
+        val imageUrl: String,
+        val thumbnailUrl: String,
+    ) : PostMediaInfo
 }

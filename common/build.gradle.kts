@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.android.library)
     alias(libs.plugins.moko)
+    alias(libs.plugins.sqldelight)
 }
 
 group = "io.github.mmauro94"
@@ -39,6 +40,11 @@ kotlin {
                 implementation(libs.ktor.serialization.kotlinx.json)
 
                 implementation(libs.imageLoader)
+
+                // Database
+                implementation(libs.sqldelight.adapters.primitive)
+                implementation(libs.sqldelight.extensions.async)
+                implementation(libs.sqldelight.extensions.coroutines)
             }
         }
         val commonTest by getting {
@@ -55,6 +61,7 @@ kotlin {
             dependencies {
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.10.1")
+                implementation(libs.sqldelight.driver.android)
             }
         }
         val androidUnitTest by getting {
@@ -66,6 +73,7 @@ kotlin {
             dependencies {
                 api(compose.preview)
                 implementation("net.harawata:appdirs:1.2.1")
+                implementation(libs.sqldelight.driver.sqlite)
             }
         }
         val desktopTest by getting {
@@ -91,6 +99,14 @@ android {
 
 multiplatformResources {
     multiplatformResourcesPackage = "io.github.mmauro94.common"
+}
+
+sqldelight {
+    databases {
+        create("Data") {
+            packageName.set("io.github.mmauro94.octodon.common.db")
+        }
+    }
 }
 
 tasks.named<Test>("desktopTest") {

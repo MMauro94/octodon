@@ -6,6 +6,7 @@ agp = "7.4.1"
 ktor = "2.3.1"
 moko = "0.23.0"
 imageLoader = "1.5.1"
+sqldelight = "2.0.0-rc01"
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -26,6 +27,12 @@ moko-resources-compose = { module = "dev.icerock.moko:resources-compose", versio
 moko-resources-test = { module = "dev.icerock.moko:resources-test", version.ref = "moko" }
 moko-resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "moko" }
 
+sqldelight-adapters-primitive = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
+sqldelight-extensions-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+sqldelight-extensions-async = { module = "app.cash.sqldelight:async-extensions", version.ref = "sqldelight" }
+sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -38,3 +45,5 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
 moko = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "moko" }
+
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }

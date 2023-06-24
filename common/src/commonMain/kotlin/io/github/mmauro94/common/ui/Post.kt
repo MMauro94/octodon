@@ -41,8 +41,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberAsyncImagePainter
 import io.github.mmauro94.common.client.entities.Community
-import io.github.mmauro94.common.client.entities.PostView
 import io.github.mmauro94.common.client.entities.PostMediaInfo
+import io.github.mmauro94.common.client.entities.PostView
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
@@ -54,7 +54,7 @@ private val LATERAL_PADDING = 8.dp
 fun Post(
     postView: PostView,
 ) {
-    Box(Modifier.padding(vertical = 6.dp)) {
+    Box(Modifier.padding(bottom = 12.dp)) {
         Surface(shadowElevation = 4.dp, tonalElevation = 4.dp) {
             Column(Modifier.padding(top = 8.dp)) {
                 PostHeader(postView)
@@ -157,7 +157,7 @@ fun ColumnScope.PostContent(postView: PostView) {
             )
         }
     }
-    if (postView.post.body != null) {
+    if (!postView.post.body.isNullOrBlank()) {
         Spacer(Modifier.height(8.dp))
         Surface(
             modifier = Modifier.padding(horizontal = LATERAL_PADDING).padding(top = 4.dp).fillMaxWidth(),

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <plural name="sort_top_n_hours">
+        <item quantity="zero">Top now</item>
+        <item quantity="one">Top %d hour</item>
+        <item quantity="other">Top %d hours</item>
+    </plural>
+</resources>

@@ -1,40 +1,39 @@
 package io.github.mmauro94.common
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.LocalImageLoader
-import io.github.mmauro94.common.Screens.HOME
 import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.ui.AppTheme
 import io.github.mmauro94.common.ui.Feed
-
-private enum class Screens(val icon: ImageVector) {
-    HOME(Icons.Default.Home),
-    INBOX(Icons.Default.Mail),
-    SAVED(Icons.Default.Star),
-    PROFILE(Icons.Default.Person),
-}
+import io.github.mmauro94.common.ui.FeedRequest
+import io.github.mmauro94.common.ui.components.SortMenuButton
+import kotlinx.coroutines.launch
 
 @Composable
 fun App() {
@@ -52,29 +51,42 @@ fun App() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppContent() {
-    var currentScreen by remember { mutableStateOf(HOME) }
+    val cs = rememberCoroutineScope()
     val client = remember { LemmyClient("https://lemmy.ml/") }
+    var feedRequest by remember(client) { mutableStateOf(FeedRequest.default(client)) }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
 
-    Column {
-        when (currentScreen) {
-            HOME -> Feed(client = client, modifier = Modifier.weight(1f).fillMaxWidth())
-            else -> Spacer(Modifier.weight(1f))
-        }
-
-        NavigationBar(tonalElevation = 8.dp) {
-            Screens.values().forEach { screen ->
-                NavigationBarItem(
-                    selected = screen == currentScreen,
-                    icon = { Icon(screen.icon, null) },
-                    label = { Text(screen.name.lowercase().replaceFirstChar { it.uppercase() }) },
-                    onClick = {
-                        currentScreen = screen
-                    },
-                    alwaysShowLabel = false,
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Text("Drawer title", modifier = Modifier.padding(16.dp))
+                Divider()
+                NavigationDrawerItem(
+                    label = { Text(text = "Drawer Item") },
+                    selected = false,
+                    onClick = { /*TODO*/ },
                 )
             }
+        },
+    ) {
+        Column {
+            TopAppBar(
+                title = { Text("Octodon") },
+                modifier = Modifier.fillMaxWidth(),
+                navigationIcon = {
+                    IconButton({ cs.launch { drawerState.open() } }) {
+                        Icon(Icons.Default.Menu, "open menu")
+                    }
+                },
+                actions = {
+                    SortMenuButton(onSortSelected = { feedRequest = feedRequest.copy(sort = it) })
+                },
+            )
+            Feed(feedRequest = feedRequest, modifier = Modifier.weight(1f).fillMaxWidth())
         }
     }
 }

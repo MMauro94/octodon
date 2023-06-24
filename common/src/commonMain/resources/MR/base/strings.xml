@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="hello_world">Hello world!</string>
+    <string name="action_back">Back</string>
+
+    <string name="sort_active">Active</string>
+    <string name="sort_hot">Hot</string>
+    <string name="sort_new">New</string>
+    <string name="sort_old">Old</string>
+    <string name="sort_top">Top</string>
+    <string name="sort_top_day">Top day</string>
+    <string name="sort_top_week">Top week</string>
+    <string name="sort_top_month">Top month</string>
+    <string name="sort_top_year">Top year</string>
+    <string name="sort_top_all">Top all</string>
+    <string name="sort_most_comments">Most comments</string>
+    <string name="sort_new_comments">New comments</string>
 </resources>

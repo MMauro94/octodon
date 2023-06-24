@@ -95,6 +95,7 @@ fun Feed(
         }
     }
     Box(modifier) {
+        // TODO empty feed view
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp), state = lazyColumnState) {
             items(feed.posts) { Post(it) }
             when (val state = feed.state) {

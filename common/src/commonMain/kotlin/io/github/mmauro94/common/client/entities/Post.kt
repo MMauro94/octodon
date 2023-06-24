@@ -15,7 +15,7 @@ data class Post(
     val community: Community,
     @SerialName("creator_banned_from_community") val creatorBannedFromCommunity: Boolean,
     val counts: Counts,
-    val subscribed: SubcriptionStatus,
+    val subscribed: SubscribedType,
     val saved: Boolean,
     val read: Boolean,
     @SerialName("creator_blocked") val creatorBlocked: Boolean,

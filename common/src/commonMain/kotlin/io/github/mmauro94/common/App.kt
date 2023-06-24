@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.LocalImageLoader
 import io.github.mmauro94.common.client.LemmyClient
+import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.ui.AppTheme
 import io.github.mmauro94.common.ui.Feed
 import io.github.mmauro94.common.ui.FeedRequest
@@ -65,11 +66,14 @@ private fun AppContent() {
             ModalDrawerSheet {
                 Text("Drawer title", modifier = Modifier.padding(16.dp))
                 Divider()
-                NavigationDrawerItem(
-                    label = { Text(text = "Drawer Item") },
-                    selected = false,
-                    onClick = { /*TODO*/ },
-                )
+                ListingType.values().forEach { listingType ->
+                    NavigationDrawerItem(
+                        label = { Text(listingType.label.str()) },
+                        selected = feedRequest.type == listingType,
+                        onClick = { feedRequest = feedRequest.copy(type = listingType, communityId = null) },
+                        icon = { Icon(listingType.icon, null) },
+                    )
+                }
             }
         },
     ) {

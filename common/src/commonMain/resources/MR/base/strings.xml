@@ -14,4 +14,8 @@
     <string name="sort_top_all">Top all</string>
     <string name="sort_most_comments">Most comments</string>
     <string name="sort_new_comments">New comments</string>
+
+    <string name="listing_type_all">All</string>
+    <string name="listing_type_subscribed">Subscribed</string>
+    <string name="listing_type_local">Local</string>
 </resources>

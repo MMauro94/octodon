@@ -102,7 +102,7 @@ fun PostHeader(postView: PostView) {
             )
             if (postView.post.url != null && postView.post.mediaInfo == null) {
                 Spacer(Modifier.width(8.dp))
-                Surface(Modifier.size(64.dp), shape = MaterialTheme.shapes.medium) {
+                Surface(Modifier.size(64.dp), shape = MaterialTheme.shapes.extraSmall) {
                     if (postView.post.thumbnailUrl != null) {
                         val painter = rememberAsyncImagePainter(postView.post.thumbnailUrl)
                         Image(
@@ -164,7 +164,7 @@ fun ColumnScope.PostContent(postView: PostView) {
         Surface(
             modifier = Modifier.padding(horizontal = LATERAL_PADDING).padding(top = 4.dp).fillMaxWidth(),
             color = MaterialTheme.colorScheme.surfaceVariant,
-            shape = MaterialTheme.shapes.medium,
+            shape = MaterialTheme.shapes.extraSmall,
         ) {
             Box(Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
                 PostBody(

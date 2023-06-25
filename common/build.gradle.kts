@@ -40,6 +40,7 @@ kotlin {
                 implementation(libs.ktor.serialization.kotlinx.json)
 
                 implementation(libs.imageLoader)
+                implementation(libs.multiplatformMarkdownRenderer)
 
                 // Database
                 implementation(libs.sqldelight.adapters.primitive)

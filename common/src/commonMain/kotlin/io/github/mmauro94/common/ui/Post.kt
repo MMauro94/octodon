@@ -40,6 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberAsyncImagePainter
+import dev.icerock.moko.resources.compose.stringResource
+import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.client.entities.Community
 import io.github.mmauro94.common.client.entities.PostMediaInfo
 import io.github.mmauro94.common.client.entities.PostView
@@ -179,26 +181,26 @@ fun PostFooter(postView: PostView) {
     val color = MaterialTheme.colorScheme.onSurfaceLowlighted
     Row(verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.ModeComment, contentDescription = "comments", tint = color, modifier = Modifier.size(16.dp))
+            Icon(Icons.Outlined.ModeComment, stringResource(MR.strings.comments), tint = color, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(4.dp))
             Text(
-                text = "${postView.counts.comments} comments",
+                text = "${postView.counts.comments} comments", // TODO
                 style = MaterialTheme.typography.labelLarge,
                 color = color,
             )
         }
 
         Spacer(Modifier.weight(1f))
-        FooterIcon({}, icon = Icons.Default.ArrowUpward, contentDescription = "upvote")
+        FooterIcon({}, icon = Icons.Default.ArrowUpward, stringResource(MR.strings.upvote_action))
         Text(
             text = (postView.counts.upvotes - postView.counts.downvotes).toString(),
             style = MaterialTheme.typography.labelLarge,
             color = color,
         )
-        FooterIcon({}, icon = Icons.Default.ArrowDownward, contentDescription = "downvote")
-        FooterIcon({}, icon = Icons.Default.BookmarkBorder, contentDescription = "save")
-        FooterIcon({}, icon = Icons.Default.OpenInBrowser, contentDescription = "open link")
-        FooterIcon({}, icon = Icons.Default.MoreVert, contentDescription = "options")
+        FooterIcon({}, icon = Icons.Default.ArrowDownward, stringResource(MR.strings.downvote_action))
+        FooterIcon({}, icon = Icons.Default.BookmarkBorder, stringResource(MR.strings.save_action))
+        FooterIcon({}, icon = Icons.Default.OpenInBrowser, stringResource(MR.strings.open_in_browser))
+        FooterIcon({}, icon = Icons.Default.MoreVert, stringResource(MR.strings.more_options))
     }
 }
 

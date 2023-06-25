@@ -19,11 +19,9 @@ import com.seiko.imageloader.cache.memory.maxSizePercent
 import com.seiko.imageloader.component.setupDefaultComponents
 import net.harawata.appdirs.AppDirsFactory
 import okio.Path.Companion.toOkioPath
+import java.awt.Desktop
 import java.io.File
-
-actual fun getPlatformName(): String {
-    return "Desktop"
-}
+import java.net.URI
 
 @Composable
 actual fun PlatformStyle(content: @Composable () -> Unit) = CompositionLocalProvider(
@@ -77,4 +75,11 @@ actual fun generateImageLoader(): ImageLoader {
 @Composable
 actual fun appColorScheme(): ColorScheme {
     return darkColorScheme()
+}
+
+@Composable
+actual fun UrlOpener(url: String, content: @Composable (openUrl: () -> Unit) -> Unit) {
+    content {
+        Desktop.getDesktop().browse(URI.create(url))
+    }
 }

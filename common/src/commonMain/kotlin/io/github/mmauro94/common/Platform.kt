@@ -8,8 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.seiko.imageloader.ImageLoader
 
-expect fun getPlatformName(): String
-
 @Composable
 expect fun PlatformStyle(content: @Composable () -> Unit)
 
@@ -26,3 +24,6 @@ expect fun generateImageLoader(): ImageLoader
 
 @Composable
 expect fun appColorScheme(): ColorScheme
+
+@Composable
+expect fun UrlOpener(url: String, content: @Composable (openUrl: () -> Unit) -> Unit)

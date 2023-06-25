@@ -1,7 +1,6 @@
 package io.github.mmauro94.common.ui.login
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.client.api.GetSiteResponse
+import io.github.mmauro94.common.utils.Material3Markdown
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -109,13 +109,11 @@ private fun Tag(
     ifFalseIcon: ImageVector,
     ifFalseLabel: String,
 ) {
-    Box(Modifier.padding(4.dp)) {
-        Card(shape = MaterialTheme.shapes.extraSmall) {
-            Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(if (value) ifTrueIcon else ifFalseIcon, null, Modifier.size(16.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(if (value) ifTrueLabel else ifFalseLabel, style = MaterialTheme.typography.labelMedium)
-            }
+    Card(shape = MaterialTheme.shapes.extraSmall, modifier = Modifier.padding(4.dp)) {
+        Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(if (value) ifTrueIcon else ifFalseIcon, null, Modifier.size(16.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(if (value) ifTrueLabel else ifFalseLabel, style = MaterialTheme.typography.labelMedium)
         }
     }
 }
@@ -135,7 +133,10 @@ private fun ColumnScope.Info(title: String, content: String?) {
     if (content != null) {
         val modifier = Modifier.align(Alignment.Start)
         Text(title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, modifier = modifier)
-        Text(content, style = MaterialTheme.typography.bodyMedium, modifier = modifier)
+        Spacer(Modifier.height(8.dp))
+        HighlightedElement(border = false) {
+            Material3Markdown(content)
+        }
         Spacer(Modifier.height(16.dp))
     }
 }

@@ -79,22 +79,32 @@ internal fun LoginStepContainer(
             }
             Spacer(Modifier.height(32.dp))
             if (stepDescription != null) {
-                Surface(
-                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                    shape = MaterialTheme.shapes.extraSmall,
-                ) {
-                    Text(
-                        stepDescription,
-                        Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                HighlightedElement(border = true) {
+                    Text(stepDescription, style = MaterialTheme.typography.bodyMedium)
                 }
                 Spacer(Modifier.height(32.dp))
             }
             content()
             Spacer(Modifier.weight(1f))
             Spacer(Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+internal fun HighlightedElement(
+    modifier: Modifier = Modifier,
+    border: Boolean,
+    content: @Composable () -> Unit,
+) {
+    Surface(
+        modifier = modifier,
+        border = if (border) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+        shape = MaterialTheme.shapes.extraSmall,
+    ) {
+        Box(Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth()) {
+            content()
         }
     }
 }

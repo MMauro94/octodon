@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="action_back">Back</string>
+    <string name="back_action">Back</string>
 
     <string name="sort_active">Active</string>
     <string name="sort_hot">Hot</string>
@@ -18,4 +18,24 @@
     <string name="listing_type_all">All</string>
     <string name="listing_type_subscribed">Subscribed</string>
     <string name="listing_type_local">Local</string>
+
+    <string name="server_url">Server URL</string>
+    <string name="help">Help</string>
+    <string name="anonymous_login">Anonymous login</string>
+    <string name="username_or_email">Username or email</string>
+    <string name="password">Password</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="add_server">Hide password</string>
+    <string name="log_in_action">Log in</string>
+    <string name="add_server_or_account">Add server or account</string>
+    <string name="open_menu">Open menu</string>
+    <string name="retry_action">Retry</string>
+    <string name="comments">Comments</string>
+    <string name="upvote_action">Upvote</string>
+    <string name="downvote_action">Downvote</string>
+    <string name="save_action">Save</string>
+    <string name="open_in_browser">Open in browser</string>
+    <string name="more_options">More options</string>
+    <string name="sort_noun">Sort</string>
 </resources>

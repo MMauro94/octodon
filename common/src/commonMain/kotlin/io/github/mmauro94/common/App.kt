@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.seiko.imageloader.LocalImageLoader
+import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.platform.createSqlDriver
@@ -97,7 +98,7 @@ private fun AppContent() {
                 drawerContent = {
                     ModalDrawerSheet {
                         NavigationDrawerItem(
-                            label = { Text("Add server login") }, // TODO
+                            label = { Text(stringResource(MR.strings.add_server_or_account)) },
                             selected = false,
                             onClick = { addAccount = true },
                             icon = { Icon(Icons.Default.Add, null) },
@@ -120,7 +121,7 @@ private fun AppContent() {
                         modifier = Modifier.fillMaxWidth(),
                         navigationIcon = {
                             IconButton({ cs.launch { drawerState.open() } }) {
-                                Icon(Icons.Default.Menu, "open menu")
+                                Icon(Icons.Default.Menu, stringResource(MR.strings.open_menu))
                             }
                         },
                         actions = {

@@ -33,6 +33,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import dev.icerock.moko.resources.compose.stringResource
+import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.client.api.getSite
@@ -65,9 +67,9 @@ fun AddServerLogin(
                 value = serverUrl,
                 onValueChange = { serverUrl = it },
                 leadingIcon = { Icon(Icons.Default.Dns, null) },
-                label = { Text("Server URL") }, // TODO
+                label = { Text(stringResource(MR.strings.server_url)) },
                 placeholder = { Text("https://lemmy.example.com") },
-                trailingIcon = { IconButton({}) { Icon(Icons.Default.Help, "help") } }, // TODO
+                trailingIcon = { IconButton({}) { Icon(Icons.Default.Help, stringResource(MR.strings.help)) } },
             )
             Spacer(Modifier.height(16.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -75,7 +77,7 @@ fun AddServerLogin(
                     checked = isAnonymous,
                     onCheckedChange = { isAnonymous = it },
                 )
-                Text(text = "Anonymous login") // TODO
+                Text(stringResource(MR.strings.anonymous_login))
             }
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -83,7 +85,7 @@ fun AddServerLogin(
                 value = usernameOrEmail,
                 onValueChange = { usernameOrEmail = it },
                 leadingIcon = { Icon(Icons.Default.Person, null) },
-                label = { Text("Username or email") }, // TODO
+                label = { Text(stringResource(MR.strings.username_or_email)) },
                 placeholder = { Text("") },
             )
             Spacer(Modifier.height(8.dp))
@@ -93,7 +95,7 @@ fun AddServerLogin(
                 value = password,
                 onValueChange = { password = it },
                 leadingIcon = { Icon(Icons.Default.Password, null) },
-                label = { Text("Password") }, // TODO
+                label = { Text(stringResource(MR.strings.password)) },
                 placeholder = { Text("") },
                 visualTransformation = when (showPassword) {
                     true -> VisualTransformation.None
@@ -101,7 +103,11 @@ fun AddServerLogin(
                 },
                 trailingIcon = {
                     IconButton({ showPassword = !showPassword }) {
-                        Icon(if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility, "toggle show password") // TODO
+                        if (showPassword) {
+                            Icon(Icons.Default.VisibilityOff, stringResource(MR.strings.hide_password))
+                        } else {
+                            Icon(Icons.Default.Visibility, stringResource(MR.strings.show_password))
+                        }
                     }
                 },
             )
@@ -115,9 +121,9 @@ fun AddServerLogin(
                 },
             ) {
                 if (isAnonymous) {
-                    Text("Add server") // TODO
+                    Text(stringResource(MR.strings.add_server))
                 } else {
-                    Text("Log in") // TODO
+                    Text(stringResource(MR.strings.log_in_action))
                 }
             }
 

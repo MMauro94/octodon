@@ -41,7 +41,7 @@ fun SortMenuButton(
 
     Box {
         IconButton({ expanded = true }) {
-            Icon(Icons.Default.Sort, "sort")
+            Icon(Icons.Default.Sort, stringResource(MR.strings.sort_noun))
         }
         DropdownMenu(
             expanded = expanded,
@@ -122,9 +122,9 @@ private fun ColumnScope.Group(
 ) {
     DropdownMenuItem(
         modifier = Modifier.fillMaxWidth(),
-        text = { Text(stringResource(MR.strings.action_back)) },
+        text = { Text(stringResource(MR.strings.back_action)) },
         onClick = onBack,
-        leadingIcon = { Icon(Icons.Default.ArrowBack, "back") },
+        leadingIcon = { Icon(Icons.Default.ArrowBack, stringResource(MR.strings.back_action)) },
     )
     Divider()
     SortType.GROUPS.getValue(group).forEach { type ->

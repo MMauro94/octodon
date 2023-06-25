@@ -21,6 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import dev.icerock.moko.resources.compose.stringResource
+import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.PlatformVerticalScrollbar
 import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.ApiResult.Error
@@ -79,7 +81,7 @@ fun Feed(
                         Button(
                             onClick = { cs.launch { channel.send(state.nextPage) } },
                         ) {
-                            Text("Retry")
+                            Text(stringResource(MR.strings.retry_action))
                         }
                     }
                 }

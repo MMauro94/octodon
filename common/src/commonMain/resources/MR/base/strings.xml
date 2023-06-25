@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <string name="back_action">Back</string>
+    <string name="next">Next</string>
+    <string name="retry">Retry</string>
+
+    <string name="not_available_in_the_app_yet">Not available in the app yet</string>
 
     <string name="sort_active">Active</string>
     <string name="sort_hot">Hot</string>
@@ -38,4 +42,28 @@
     <string name="open_in_browser">Open in browser</string>
     <string name="more_options">More options</string>
     <string name="sort_noun">Sort</string>
+
+    <string name="choose_lemmy_server">Choose Lemmy server</string>
+    <string name="octodon_description_brief">Octodon is an app for Lemmy, a decentralized social link aggregation and discussion platform.</string>
+    <string name="log_in_on_x">Log in on %s.</string>
+    <string name="sign_up_on_x">Sign up on %s.</string>
+    <string name="log_in">Log in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="sign_up_online">Sign up online</string>
+    <string name="browse_anonymously">Browse anonymously</string>
+    <string name="downvotes_enabled">Downvotes enabled</string>
+    <string name="downvotes_disabled">Downvotes disabled</string>
+    <string name="federation_enabled">Federation enabled</string>
+    <string name="federation_disabled">Federation disabled</string>
+    <string name="public_instance">Public</string>
+    <string name="private_instance">Private</string>
+    <string name="email_verification_required">Email verification required</string>
+    <string name="email_verification_not_required">Email verification not required</string>
+    <string name="nsfw_enabled">NSFW enabled</string>
+    <string name="nsfw_disabled">NSFW disabled</string>
+    <string name="banner">Banner</string>
+    <string name="description">Description</string>
+    <string name="sidebar">Sidebar</string>
+    <string name="legal_information">Legal information</string>
+    <string name="credentials_not_available_yet">Credentials not available yet</string>
 </resources>

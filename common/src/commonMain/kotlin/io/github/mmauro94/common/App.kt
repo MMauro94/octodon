@@ -41,7 +41,7 @@ import io.github.mmauro94.common.platform.createSqlDriver
 import io.github.mmauro94.common.ui.Feed
 import io.github.mmauro94.common.ui.FeedRequest
 import io.github.mmauro94.common.ui.components.SortMenuButton
-import io.github.mmauro94.common.ui.screen.AddServerLogin
+import io.github.mmauro94.common.ui.login.AddServerLoginWorkflow
 import io.github.mmauro94.common.utils.LocalDataDb
 import io.github.mmauro94.octodon.common.db.Data
 import kotlinx.coroutines.Dispatchers
@@ -89,7 +89,7 @@ private fun AppContent() {
         }
 
         users.isEmpty() || addAccount -> {
-            AddServerLogin(Modifier.fillMaxSize(), onAdded = { addAccount = false })
+            AddServerLoginWorkflow(Modifier.fillMaxSize()) { addAccount = false }
         }
 
         else -> {

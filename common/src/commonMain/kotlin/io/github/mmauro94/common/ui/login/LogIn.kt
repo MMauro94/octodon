@@ -72,9 +72,10 @@ fun LogIn(
                 is WorkerState.Done -> when (state.result) {
                     is ApiResult.Error -> workerStateState = WorkerState.Done(state.input, state.result.exception.message.orEmpty())
                     is ApiResult.Success -> if (state.result.result.jwt != null) {
+                        workerStateState = WorkerState.Resting
                         login(state.input.usernameOrEmail, state.result.result.jwt)
                     } else {
-                        WorkerState.Done(state.input, credentialsNotAvailableYetStr)
+                        workerStateState = WorkerState.Done(state.input, credentialsNotAvailableYetStr)
                     }
                 }
             }

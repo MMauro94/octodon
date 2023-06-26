@@ -3,23 +3,20 @@ package io.github.mmauro94.common
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -35,15 +32,19 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.seiko.imageloader.LocalImageLoader
 import dev.icerock.moko.resources.compose.stringResource
-import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.client.entities.ListingType
+import io.github.mmauro94.common.client.entities.PostView
+import io.github.mmauro94.common.navigation.NavigationDestination
+import io.github.mmauro94.common.navigation.StackData
+import io.github.mmauro94.common.navigation.StackNavigation
 import io.github.mmauro94.common.platform.createSqlDriver
-import io.github.mmauro94.common.ui.Feed
 import io.github.mmauro94.common.ui.FeedRequest
-import io.github.mmauro94.common.ui.components.SortMenuButton
-import io.github.mmauro94.common.ui.login.AddServerLoginWorkflow
+import io.github.mmauro94.common.ui.screens.AddServerLoginScreen
+import io.github.mmauro94.common.ui.screens.FeedScreen
+import io.github.mmauro94.common.ui.screens.PostScreen
 import io.github.mmauro94.common.utils.LocalDataDb
 import io.github.mmauro94.octodon.common.db.Data
+import io.github.mmauro94.octodon.common.db.ServerLogin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -66,69 +67,131 @@ fun App() {
     }
 }
 
+sealed interface OctodonDestination : NavigationDestination {
+    class Feed(val serverLogin: ServerLogin) : OctodonDestination {
+        var feedRequest by mutableStateOf(FeedRequest.default())
+    }
+
+    class Post(val serverLogin: ServerLogin, val post: PostView) : OctodonDestination
+
+    object AddServer : OctodonDestination
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppContent() {
     val cs = rememberCoroutineScope()
     val db = LocalDataDb.current
-    val client = remember { LemmyClient("https://lemmy.ml/") }
-    var feedRequest by remember(client) { mutableStateOf(FeedRequest.default(client)) }
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    var addAccount by remember { mutableStateOf(false) }
-
     val usersState by remember(db) {
         db.serverLoginQueries.selectAll().asFlow().mapToList(Dispatchers.IO)
     }.collectAsState(null)
-
     val users = usersState
-    when {
-        users == null -> {
-            Box(contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
 
-        users.isEmpty() || addAccount -> {
-            AddServerLoginWorkflow(Modifier.fillMaxSize()) { addAccount = false }
-        }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val openDrawerLambda: () -> Unit = { cs.launch { drawerState.open() } }
 
-        else -> {
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = {
-                    ModalDrawerSheet {
+    if (users == null) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator()
+        }
+    } else {
+        var userState by remember { mutableStateOf(users.firstOrNull()) }
+        if (userState !in users) {
+            userState = users.firstOrNull()
+        }
+        val user = userState
+        var stackData by remember {
+            mutableStateOf(StackData.of<OctodonDestination>(OctodonDestination.AddServer))
+        }
+        remember(user) {
+            stackData = StackData.of(
+                if (user != null) {
+                    OctodonDestination.Feed(user)
+                } else {
+                    OctodonDestination.AddServer
+                },
+            )
+        }
+        val main = stackData.stack.firstOrNull { it is OctodonDestination.Feed } as OctodonDestination.Feed?
+
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet {
+                    users.forEach { u ->
                         NavigationDrawerItem(
-                            label = { Text(stringResource(MR.strings.add_server_or_account)) },
-                            selected = false,
-                            onClick = { addAccount = true },
-                            icon = { Icon(Icons.Default.Add, null) },
+                            label = {
+                                Column {
+                                    Text(u.username ?: stringResource(MR.strings.anonymous))
+                                    Text(u.serverUrl, style = MaterialTheme.typography.labelSmall)
+                                }
+                            },
+                            selected = u == user,
+                            onClick = {
+                                cs.launch { drawerState.close() }
+                                userState = u
+                            },
+                            icon = { Icon(Icons.Default.Person, null) },
                         )
+                    }
+                    NavigationDrawerItem(
+                        label = { Text(stringResource(MR.strings.add_server_or_account)) },
+                        selected = false,
+                        onClick = {
+                            cs.launch { drawerState.close() }
+                            stackData = stackData.push(OctodonDestination.AddServer)
+                        },
+                        icon = { Icon(Icons.Default.Add, null) },
+                    )
+                    if (main != null) {
                         Divider()
                         ListingType.values().forEach { listingType ->
                             NavigationDrawerItem(
                                 label = { Text(listingType.label.str()) },
-                                selected = feedRequest.type == listingType,
-                                onClick = { feedRequest = feedRequest.copy(type = listingType, communityId = null) },
+                                selected = main.feedRequest.type == listingType,
+                                onClick = {
+                                    cs.launch { drawerState.close() }
+                                    stackData = stackData.popUntil(main)
+                                    main.feedRequest = main.feedRequest.copy(type = listingType, communityId = null)
+                                },
                                 icon = { Icon(listingType.icon, null) },
                             )
                         }
                     }
+                }
+            },
+        ) {
+            StackNavigation(
+                stack = stackData,
+                dismiss = {
+                    if (stackData.canPop(it)) {
+                        stackData = stackData.pop(it)
+                        true
+                    } else {
+                        false
+                    }
                 },
-            ) {
-                Column {
-                    TopAppBar(
-                        title = { Text("Octodon") },
-                        modifier = Modifier.fillMaxWidth(),
-                        navigationIcon = {
-                            IconButton({ cs.launch { drawerState.open() } }) {
-                                Icon(Icons.Default.Menu, stringResource(MR.strings.open_menu))
-                            }
-                        },
-                        actions = {
-                            SortMenuButton(onSortSelected = { feedRequest = feedRequest.copy(sort = it) })
-                        },
+            ) { location, state ->
+                when (location) {
+                    is OctodonDestination.AddServer -> AddServerLoginScreen(
+                        state,
+                        openDrawer = openDrawerLambda,
                     )
-                    Feed(feedRequest = feedRequest, modifier = Modifier.weight(1f).fillMaxWidth())
+
+                    is OctodonDestination.Feed -> FeedScreen(
+                        location,
+                        state,
+                        onPostClick = { post ->
+                            stackData = stackData.push(OctodonDestination.Post(location.serverLogin, post))
+                        },
+                        openDrawer = openDrawerLambda,
+                    )
+
+                    is OctodonDestination.Post -> PostScreen(
+                        location,
+                        state,
+                        openDrawer = openDrawerLambda,
+                    )
                 }
             }
         }

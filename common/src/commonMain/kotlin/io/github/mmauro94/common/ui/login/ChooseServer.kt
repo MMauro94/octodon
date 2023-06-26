@@ -52,7 +52,10 @@ fun ChooseServer(
                 WorkerState.Loading -> workerStateState = WorkerState.Loading
                 WorkerState.Resting -> workerStateState = WorkerState.Resting
                 is WorkerState.Done -> when (state.result) {
-                    is ApiResult.Success -> setServer(state.input, state.result.result)
+                    is ApiResult.Success -> {
+                        workerStateState = WorkerState.Resting
+                        setServer(state.input, state.result.result)
+                    }
                     is ApiResult.Error -> workerStateState = WorkerState.Done(state.input, state.result.exception.message.orEmpty())
                 }
             }

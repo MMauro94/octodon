@@ -127,7 +127,7 @@ internal fun <T> ActionButton(
                 WorkerState.Loading -> CircularProgressIndicator()
                 is WorkerState.Done -> {
                     Button({ cs.launch { workerChannel.send(WorkerMessage.Process(inputs())) } }) {
-                        stringResource(MR.strings.retry)
+                        Text(stringResource(MR.strings.retry))
                     }
                 }
 

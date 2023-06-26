@@ -50,6 +50,7 @@
     <string name="log_in">Log in</string>
     <string name="sign_up">Sign up</string>
     <string name="sign_up_online">Sign up online</string>
+    <string name="anonymous">Anonymous</string>
     <string name="browse_anonymously">Browse anonymously</string>
     <string name="downvotes_enabled">Downvotes enabled</string>
     <string name="downvotes_disabled">Downvotes disabled</string>

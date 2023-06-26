@@ -39,18 +39,20 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun Feed(
+    client: LemmyClient,
     feedRequest: FeedRequest,
     modifier: Modifier = Modifier,
+    onPostClick: (PostView) -> Unit,
 ) {
     val cs = rememberCoroutineScope()
-    var feed by remember(feedRequest) { mutableStateOf(FeedInfo.DEFAULT) }
-    val channel = remember(feedRequest) { Channel<Int>(Channel.CONFLATED) }
+    var feed by remember(client, feedRequest) { mutableStateOf(FeedInfo.DEFAULT) }
+    val channel = remember(client, feedRequest) { Channel<Int>(Channel.CONFLATED) }
     val lazyColumnState = rememberLazyListState()
-    LaunchedEffect(feedRequest) {
+    LaunchedEffect(client, feedRequest) {
         for (page in channel) {
             feed = feed.copy(state = FeedState.Loading(nextPage = page))
             val posts = async(Dispatchers.IO) {
-                feedRequest.getPosts(page)
+                feedRequest.getPosts(client, page)
             }.await()
             feed = when (posts) {
                 is Error -> feed.copy(
@@ -73,7 +75,9 @@ fun Feed(
     Box(modifier) {
         // TODO empty feed view
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 32.dp), state = lazyColumnState) {
-            items(feed.postViews) { Post(it) }
+            items(feed.postViews) { post ->
+                Post(post, onClick = { onPostClick(post) })
+            }
             when (val state = feed.state) {
                 is FeedState.Error -> item {
                     Column {
@@ -136,13 +140,12 @@ data class FeedInfo(
 }
 
 data class FeedRequest(
-    val client: LemmyClient,
     val sort: SortType,
     val type: ListingType,
     val communityId: Long? = null,
 ) {
 
-    suspend fun getPosts(page: Int): ApiResult<List<PostView>> {
+    suspend fun getPosts(client: LemmyClient, page: Int): ApiResult<List<PostView>> {
         return client.getPosts(
             page = page,
             communityId = communityId,
@@ -152,9 +155,8 @@ data class FeedRequest(
     }
 
     companion object {
-        fun default(client: LemmyClient): FeedRequest {
+        fun default(): FeedRequest {
             return FeedRequest(
-                client = client,
                 sort = SortType.HOT,
                 type = ListingType.ALL,
             )

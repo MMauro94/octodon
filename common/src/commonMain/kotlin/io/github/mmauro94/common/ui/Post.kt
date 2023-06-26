@@ -2,6 +2,7 @@ package io.github.mmauro94.common.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -55,12 +56,16 @@ private val LATERAL_PADDING = 8.dp
 @Composable
 fun Post(
     postView: PostView,
+    onClick: (() -> Unit)?,
+    maxContentLines: Int = 4,
 ) {
     Box(Modifier.padding(bottom = 12.dp)) {
         Surface(shadowElevation = 4.dp, tonalElevation = 4.dp) {
-            Column(Modifier.padding(top = 8.dp)) {
+            var modifier: Modifier = Modifier
+            if (onClick != null) modifier = modifier.clickable(onClick = onClick)
+            Column(modifier.padding(top = 8.dp)) {
                 PostHeader(postView)
-                PostContent(postView)
+                PostContent(postView, maxLines = maxContentLines)
                 PostFooter(postView)
             }
         }
@@ -142,7 +147,7 @@ fun CommunityInfo(
 }
 
 @Composable
-fun ColumnScope.PostContent(postView: PostView) {
+fun ColumnScope.PostContent(postView: PostView, maxLines: Int = Int.MAX_VALUE) {
     when (val mediaInfo = postView.post.mediaInfo) {
         null -> {}
         is PostMediaInfo.Image -> {
@@ -169,7 +174,7 @@ fun ColumnScope.PostContent(postView: PostView) {
             Box(Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
                 PostBody(
                     body = postView.post.body,
-                    maxLines = 4,
+                    maxLines = maxLines,
                 )
             }
         }

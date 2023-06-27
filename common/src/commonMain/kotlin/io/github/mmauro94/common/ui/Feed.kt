@@ -58,7 +58,8 @@ fun Feed(
                 is Error -> feed.copy(
                     state = FeedState.Error(
                         nextPage = page,
-                        posts.exception.message ?: "Unknown error",
+                        // TODO: translate
+                        posts.error.message ?: "Unknown error",
                     ),
                 )
 

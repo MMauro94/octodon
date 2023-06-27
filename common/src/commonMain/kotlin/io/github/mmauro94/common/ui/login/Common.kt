@@ -32,14 +32,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
+import io.github.mmauro94.common.utils.AsyncState
 import io.github.mmauro94.common.utils.WorkerMessage
-import io.github.mmauro94.common.utils.WorkerState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-
-internal typealias ErrorMessage = String
 
 @Composable
 internal fun LoginStepContainer(
@@ -115,7 +114,7 @@ internal fun <T> ActionButton(
     action: String,
     inputs: () -> T,
     workerChannel: Channel<WorkerMessage<T>>,
-    state: WorkerState<*, ErrorMessage>,
+    state: AsyncState<*, StringResource>,
 ) {
     val cs = rememberCoroutineScope()
     AnimatedContent(
@@ -124,14 +123,14 @@ internal fun <T> ActionButton(
     ) { ws ->
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             when (ws) {
-                WorkerState.Loading -> CircularProgressIndicator()
-                is WorkerState.Done -> {
+                AsyncState.Loading -> CircularProgressIndicator()
+                is AsyncState.Error -> {
                     Button({ cs.launch { workerChannel.send(WorkerMessage.Process(inputs())) } }) {
                         Text(stringResource(MR.strings.retry))
                     }
                 }
 
-                WorkerState.Resting -> {
+                else -> {
                     Button({ cs.launch { workerChannel.send(WorkerMessage.Process(inputs())) } }) {
                         Text(action)
                     }

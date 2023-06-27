@@ -24,14 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
-import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.client.api.GetSiteResponse
 import io.github.mmauro94.common.client.api.getSite
+import io.github.mmauro94.common.utils.AsyncState
+import io.github.mmauro94.common.utils.Result
 import io.github.mmauro94.common.utils.WorkerMessage
-import io.github.mmauro94.common.utils.WorkerState
 import io.github.mmauro94.common.utils.composeWorker
 import kotlinx.coroutines.launch
 
@@ -42,26 +43,17 @@ fun ChooseServer(
     setServer: (client: LemmyClient, GetSiteResponse) -> Unit,
 ) {
     val cs = rememberCoroutineScope()
-    var workerStateState: WorkerState<LemmyClient, ErrorMessage> by remember { mutableStateOf(WorkerState.Resting) }
-    val workerChannel = composeWorker<LemmyClient, ApiResult<GetSiteResponse>>(
+    val (asyncState, workerChannel) = composeWorker<LemmyClient, GetSiteResponse, StringResource>(
         process = { client ->
-            client.getSite()
-        },
-        onStateChange = { state ->
-            when (state) {
-                WorkerState.Loading -> workerStateState = WorkerState.Loading
-                WorkerState.Resting -> workerStateState = WorkerState.Resting
-                is WorkerState.Done -> when (state.result) {
-                    is ApiResult.Success -> {
-                        workerStateState = WorkerState.Resting
-                        setServer(state.input, state.result.result)
-                    }
-                    is ApiResult.Error -> workerStateState = WorkerState.Done(state.input, state.result.exception.message.orEmpty())
-                }
+            when (val site = client.getSite()) {
+                is Result.Success -> site
+                is Result.Error -> Result.Error(MR.strings.connection_error)
             }
         },
+        onSuccess = { client, site ->
+            setServer(client, site)
+        },
     )
-    val workerState = workerStateState
     var serverUrl by remember { mutableStateOf("") }
     val client = remember(serverUrl) {
         if (serverUrl.contains("://")) {
@@ -88,11 +80,11 @@ fun ChooseServer(
             label = { Text(stringResource(MR.strings.server_url)) },
             placeholder = { Text("https://lemmy.example.com") },
             singleLine = true,
-            isError = workerState is WorkerState.Done,
+            isError = asyncState is AsyncState.Success,
             supportingText = {
                 Box(Modifier.animateContentSize()) {
-                    if (workerState is WorkerState.Done) {
-                        Text(workerState.result)
+                    if (asyncState is AsyncState.Error) {
+                        Text(stringResource(asyncState.error))
                     }
                 }
             },
@@ -110,7 +102,7 @@ fun ChooseServer(
             stringResource(MR.strings.next),
             { client },
             workerChannel,
-            workerState,
+            asyncState,
         )
     }
 }

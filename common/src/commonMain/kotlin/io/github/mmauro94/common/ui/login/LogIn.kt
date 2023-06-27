@@ -32,15 +32,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
-import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.client.api.GetSiteResponse
 import io.github.mmauro94.common.client.api.LoginResponse
 import io.github.mmauro94.common.client.api.login
+import io.github.mmauro94.common.utils.AsyncState
+import io.github.mmauro94.common.utils.Result
 import io.github.mmauro94.common.utils.WorkerMessage
-import io.github.mmauro94.common.utils.WorkerState
 import io.github.mmauro94.common.utils.composeWorker
 import kotlinx.coroutines.launch
 
@@ -58,40 +59,30 @@ fun LogIn(
     serverInfo: GetSiteResponse,
     onLoggedIn: (usernameOrEmail: String, token: String) -> Unit,
 ) {
-    val credentialsNotAvailableYetStr = stringResource(MR.strings.credentials_not_available_yet)
-    val couldntFindUsernameOrEmailStr = stringResource(MR.strings.couldnt_find_username_or_email)
-    val passwordIncorrectStr = stringResource(MR.strings.password_incorrect)
     val cs = rememberCoroutineScope()
-    var workerStateState: WorkerState<LogInInfo, ErrorMessage> by remember { mutableStateOf(WorkerState.Resting) }
-    val workerChannel = composeWorker<LogInInfo, ApiResult<LoginResponse>>(
+
+    val (asyncState, workerChannel) = composeWorker<LogInInfo, String, StringResource>(
         process = { info ->
-            client.login(info.usernameOrEmail, info.password, info.totp2faToken)
-        },
-        onStateChange = { state ->
-            workerStateState = when (state) {
-                WorkerState.Loading -> WorkerState.Loading
-                WorkerState.Resting -> WorkerState.Resting
-                is WorkerState.Done -> when (state.result) {
-                    is ApiResult.Error -> WorkerState.Done(state.input, state.result.exception.message.orEmpty())
-
-                    is ApiResult.Success -> when (val loginResponse = state.result.result) {
-                        is LoginResponse.Successful -> when {
-                            loginResponse.jwt != null -> {
-                                onLoggedIn(state.input.usernameOrEmail, loginResponse.jwt)
-                                WorkerState.Resting
-                            }
-
-                            else -> WorkerState.Done(state.input, credentialsNotAvailableYetStr)
+            when (val apiResult = client.login(info.usernameOrEmail, info.password, info.totp2faToken)) {
+                is Result.Error -> Result.Error(MR.strings.connection_error)
+                is Result.Success -> when (val loginResponse = apiResult.result) {
+                    is LoginResponse.Successful -> when {
+                        loginResponse.jwt != null -> {
+                            Result.Success(loginResponse.jwt)
                         }
 
-                        LoginResponse.CouldntFindUsernameOrEmail -> WorkerState.Done(state.input, couldntFindUsernameOrEmailStr)
-                        LoginResponse.PasswordIncorrect -> WorkerState.Done(state.input, passwordIncorrectStr)
+                        else -> Result.Error(MR.strings.credentials_not_available_yet)
                     }
+
+                    LoginResponse.CouldntFindUsernameOrEmail -> Result.Error(MR.strings.couldnt_find_username_or_email)
+                    LoginResponse.PasswordIncorrect -> Result.Error(MR.strings.password_incorrect)
                 }
             }
         },
+        onSuccess = { loginInfo, jwt ->
+            onLoggedIn(loginInfo.usernameOrEmail, jwt)
+        },
     )
-    val workerState = workerStateState
     var usernameOrEmail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
@@ -112,7 +103,7 @@ fun LogIn(
             leadingIcon = { Icon(Icons.Default.Person, null) },
             label = { Text(stringResource(MR.strings.username_or_email)) },
             singleLine = true,
-            isError = workerState is WorkerState.Done,
+            isError = asyncState is AsyncState.Error,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
         Spacer(Modifier.height(16.dp))
@@ -139,11 +130,11 @@ fun LogIn(
                     }
                 }
             },
-            isError = workerState is WorkerState.Done,
+            isError = asyncState is AsyncState.Error,
             supportingText = {
                 Box(Modifier.animateContentSize()) {
-                    if (workerState is WorkerState.Done) {
-                        Text(workerState.result)
+                    if (asyncState is AsyncState.Error) {
+                        Text(stringResource(asyncState.error))
                     }
                 }
             },
@@ -162,7 +153,7 @@ fun LogIn(
             stringResource(MR.strings.log_in),
             { LogInInfo(usernameOrEmail, password, null) },
             workerChannel,
-            workerState,
+            asyncState,
         )
     }
 }

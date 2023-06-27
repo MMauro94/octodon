@@ -1,8 +1,8 @@
 CREATE TABLE ServerLogin (
     id INTEGER NOT NULL PRIMARY KEY,
     serverUrl TEXT NOT NULL,
-    token TEXT,
-    username TEXT
+    username TEXT,
+    token TEXT
 );
 
 selectAll:
@@ -12,4 +12,4 @@ insertServer:
 INSERT INTO ServerLogin(serverUrl) VALUES (:serverUrl);
 
 insertLogin:
-INSERT INTO ServerLogin(serverUrl, token, username) VALUES (:serverUrl, :token, :username);
+INSERT INTO ServerLogin(serverUrl, username, token) VALUES (:serverUrl,:username,:token);

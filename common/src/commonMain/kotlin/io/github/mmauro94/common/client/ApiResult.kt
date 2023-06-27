@@ -1,15 +1,11 @@
 package io.github.mmauro94.common.client
 
+import io.github.mmauro94.common.utils.Result
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.statement.HttpResponse
 
-sealed interface ApiResult<out R> {
-
-    data class Error(val exception: Exception) : ApiResult<Nothing>
-
-    data class Success<R>(val result: R) : ApiResult<R>
-}
+typealias ApiResult<R> = Result<R, Exception>
 
 typealias LemmyErrorHandler<R> = (error: LemmyError, response: HttpResponse) -> R?
 
@@ -19,11 +15,11 @@ suspend inline fun <R : Any> ApiResult(
     block: () -> R,
 ): ApiResult<R> {
     return try {
-        ApiResult.Success(block())
+        Result.Success(block())
     } catch (e: ClientRequestException) {
         handleError(e, errorHandler)
     } catch (e: Exception) {
-        ApiResult.Error(e)
+        Result.Error(e)
     }
 }
 
@@ -36,8 +32,8 @@ suspend inline fun <R : Any> handleError(e: ClientRequestException, errorHandler
     if (error != null) {
         val result = errorHandler(error, e.response)
         if (result != null) {
-            return ApiResult.Success(result)
+            return Result.Success(result)
         }
     }
-    return ApiResult.Error(e)
+    return Result.Error(e)
 }

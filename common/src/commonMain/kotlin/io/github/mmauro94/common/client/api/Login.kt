@@ -2,10 +2,12 @@ package io.github.mmauro94.common.client.api
 
 import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.LemmyClient
+import io.github.mmauro94.common.client.LemmyErrorHandler
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -15,7 +17,7 @@ suspend fun LemmyClient.login(
     password: String,
     totp2faToken: String? = null,
 ): ApiResult<LoginResponse> {
-    return ApiResult {
+    return ApiResult(ErrorHandler) {
         ktorClient.post("user/login") {
             contentType(ContentType.Application.Json)
             setBody(
@@ -25,16 +27,35 @@ suspend fun LemmyClient.login(
                     totp2faToken = totp2faToken,
                 ),
             )
-        }.body<LoginResponse>()
+        }.body<LoginResponse.Successful>()
     }
 }
 
-@Serializable
-data class LoginResponse(
-    val jwt: String?,
-    @SerialName("registration_created") val registrationCreated: Boolean,
-    @SerialName("verify_email_sent") val verifyEmailSent: Boolean,
-)
+private val ErrorHandler: LemmyErrorHandler<LoginResponse> = { error, response ->
+    if (response.status in listOf(HttpStatusCode.NotFound, HttpStatusCode.BadRequest)) {
+        when (error.error) {
+            "couldnt_find_that_username_or_email" -> LoginResponse.CouldntFindUsernameOrEmail
+            "password_incorrect" -> LoginResponse.PasswordIncorrect
+            else -> null
+        }
+    } else {
+        null
+    }
+}
+
+sealed interface LoginResponse {
+
+    @Serializable
+    data class Successful(
+        val jwt: String?,
+        @SerialName("registration_created") val registrationCreated: Boolean,
+        @SerialName("verify_email_sent") val verifyEmailSent: Boolean,
+    ) : LoginResponse
+
+    object PasswordIncorrect : LoginResponse
+
+    object CouldntFindUsernameOrEmail : LoginResponse
+}
 
 @Serializable
 private data class LoginRequestBody(

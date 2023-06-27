@@ -56,9 +56,11 @@ fun LogIn(
     modifier: Modifier,
     client: LemmyClient,
     serverInfo: GetSiteResponse,
-    login: (usernameOrEmail: String, token: String) -> Unit,
+    onLoggedIn: (usernameOrEmail: String, token: String) -> Unit,
 ) {
     val credentialsNotAvailableYetStr = stringResource(MR.strings.credentials_not_available_yet)
+    val couldntFindUsernameOrEmailStr = stringResource(MR.strings.couldnt_find_username_or_email)
+    val passwordIncorrectStr = stringResource(MR.strings.password_incorrect)
     val cs = rememberCoroutineScope()
     var workerStateState: WorkerState<LogInInfo, ErrorMessage> by remember { mutableStateOf(WorkerState.Resting) }
     val workerChannel = composeWorker<LogInInfo, ApiResult<LoginResponse>>(
@@ -66,16 +68,24 @@ fun LogIn(
             client.login(info.usernameOrEmail, info.password, info.totp2faToken)
         },
         onStateChange = { state ->
-            when (state) {
-                WorkerState.Loading -> workerStateState = WorkerState.Loading
-                WorkerState.Resting -> workerStateState = WorkerState.Resting
+            workerStateState = when (state) {
+                WorkerState.Loading -> WorkerState.Loading
+                WorkerState.Resting -> WorkerState.Resting
                 is WorkerState.Done -> when (state.result) {
-                    is ApiResult.Error -> workerStateState = WorkerState.Done(state.input, state.result.exception.message.orEmpty())
-                    is ApiResult.Success -> if (state.result.result.jwt != null) {
-                        workerStateState = WorkerState.Resting
-                        login(state.input.usernameOrEmail, state.result.result.jwt)
-                    } else {
-                        workerStateState = WorkerState.Done(state.input, credentialsNotAvailableYetStr)
+                    is ApiResult.Error -> WorkerState.Done(state.input, state.result.exception.message.orEmpty())
+
+                    is ApiResult.Success -> when (val loginResponse = state.result.result) {
+                        is LoginResponse.Successful -> when {
+                            loginResponse.jwt != null -> {
+                                onLoggedIn(state.input.usernameOrEmail, loginResponse.jwt)
+                                WorkerState.Resting
+                            }
+
+                            else -> WorkerState.Done(state.input, credentialsNotAvailableYetStr)
+                        }
+
+                        LoginResponse.CouldntFindUsernameOrEmail -> WorkerState.Done(state.input, couldntFindUsernameOrEmailStr)
+                        LoginResponse.PasswordIncorrect -> WorkerState.Done(state.input, passwordIncorrectStr)
                     }
                 }
             }

@@ -46,6 +46,7 @@ class LemmyClient(
                         encodeDefaults = true
                         ignoreUnknownKeys = true
                         explicitNulls = false
+                        coerceInputValues = true
                     },
                 )
             }

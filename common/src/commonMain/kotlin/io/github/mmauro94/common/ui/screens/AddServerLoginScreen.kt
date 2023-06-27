@@ -84,7 +84,7 @@ fun AddServerLoginScreen(
                             innerScreenModifier,
                             location.client,
                             location.serverInfo,
-                            login = { usernameOrEmail, token ->
+                            onLoggedIn = { usernameOrEmail, token ->
                                 cs.launch(Dispatchers.IO) {
                                     db.serverLoginQueries.insertLogin(location.client.url, usernameOrEmail, token)
                                     cs.launch(Dispatchers.Main) { screenState.tryPop() }

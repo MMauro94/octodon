@@ -67,4 +67,6 @@
     <string name="sidebar">Sidebar</string>
     <string name="legal_information">Legal information</string>
     <string name="credentials_not_available_yet">Credentials not available yet</string>
+    <string name="couldnt_find_username_or_email">Couldn't find username or email</string>
+    <string name="password_incorrect">The password is incorrect</string>
 </resources>

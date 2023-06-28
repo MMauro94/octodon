@@ -53,7 +53,7 @@ sealed interface AsyncState<out O, out E> {
     data class Error<E>(val error: E) : AsyncState<Nothing, E>
 }
 
-sealed interface WorkerMessage<in I> {
-    object Stop : WorkerMessage<Any?>
+sealed interface WorkerMessage<out I> {
+    object Stop : WorkerMessage<Nothing>
     data class Process<I>(val input: I) : WorkerMessage<I>
 }

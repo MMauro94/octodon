@@ -33,7 +33,7 @@ sqldelight-extensions-async = { module = "app.cash.sqldelight:async-extensions",
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 
-multiplatformMarkdownRenderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version = "0.6.1"}
+markdownParser = { module = "org.jetbrains:markdown", version = "0.4.1"}
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

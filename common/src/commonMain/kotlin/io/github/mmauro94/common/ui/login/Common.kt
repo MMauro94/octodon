@@ -99,7 +99,7 @@ internal fun HighlightedElement(
     Surface(
         modifier = modifier,
         border = if (border) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+        color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.extraSmall,
     ) {
         Box(Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth()) {

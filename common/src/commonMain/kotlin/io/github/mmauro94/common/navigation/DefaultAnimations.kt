@@ -14,22 +14,23 @@ fun Modifier.stackAnimation(
 ): Modifier {
     return graphicsLayer {
         val appearanceProgress = state.transitionState.value
-        val focusProgress = 1 - state.topItemsVisibility()
-        val visibilityProgress = appearanceProgress * focusProgress
+        var focusProgress = 1 - state.topItemsVisibility()
 
-        val translateVertically = when {
-            state.currentManualOffsetY != 0f -> true
-            state.currentManualOffsetX != 0f -> false
-            else -> preferVertical
+        if (state.zIndex.value > 0f) {
+            val translateVertically = when {
+                state.currentManualOffsetY != 0f -> true
+                state.currentManualOffsetX != 0f -> false
+                else -> preferVertical
+            }
+            val ty = if (translateVertically) (1 - appearanceProgress) * height.toPx() else 0f
+            val tx = if (!translateVertically) (1 - appearanceProgress) * width.toPx() else 0f
+            this.translationY = ty + state.currentManualOffsetY
+            this.translationX = tx + state.currentManualOffsetX
+        } else {
+            focusProgress = minOf(focusProgress, appearanceProgress)
         }
-        val ty = if (translateVertically) (1 - appearanceProgress) * height.toPx() else 0f
-        val tx = if (!translateVertically) (1 - appearanceProgress) * width.toPx() else 0f
-        this.translationY = ty + state.currentManualOffsetY
-        this.translationX = tx + state.currentManualOffsetX
-        if (!state.isOnTop) {
-            this.scaleX *= (0.95f..1f).progress(visibilityProgress)
-            this.scaleY *= (0.95f..1f).progress(visibilityProgress)
-        }
+        this.scaleX *= (0.95f..1f).progress(focusProgress)
+        this.scaleY *= (0.95f..1f).progress(focusProgress)
         this.transformOrigin = TransformOrigin(0.5f, 1f)
         val alphaRange = if (state.itemsOnTopCanSeeBehind) 0.6f..1f else 0f..1f
         this.alpha = alphaRange.progress(focusProgress)

@@ -34,7 +34,7 @@ fun FeedScreen(
                 height,
                 title = { Text("Octodon") },
                 actions = {
-                    SortMenuButton(onSortSelected = { destination.feedRequest = destination.feedRequest.copy(sort = it) })
+                    SortMenuButton(onSortSelected = { destination.sort = it })
                 },
             )
             Feed(

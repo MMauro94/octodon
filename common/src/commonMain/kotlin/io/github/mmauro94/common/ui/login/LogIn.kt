@@ -141,6 +141,7 @@ fun LogIn(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
             keyboardActions = KeyboardActions(
                 onAny = {
+                    this.defaultKeyboardAction(ImeAction.Done)
                     cs.launch { workerChannel.send(WorkerMessage.Process(LogInInfo(usernameOrEmail, password, null))) }
                 },
             ),

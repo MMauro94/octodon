@@ -1,7 +1,7 @@
 package io.github.mmauro94.common.client.api
 
-import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.LemmyClient
+import io.github.mmauro94.common.utils.Result
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -30,7 +30,7 @@ class GetPostsTest : FunSpec(
                 }
                 val client = LemmyClient("", mockEngine)
 
-                client.getPosts().shouldBeInstanceOf<ApiResult.Success<*>>()
+                client.getPosts().shouldBeInstanceOf<Result.Success<*>>()
             }
         }
     },

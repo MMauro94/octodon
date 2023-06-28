@@ -54,7 +54,11 @@ data class StackData<T : NavigationDestination>(
     }
 
     fun contains(item: T) = stack.contains(item)
+    fun isEmpty() = stack.isEmpty()
+    fun isNotEmpty() = stack.isNotEmpty()
+    fun top() = stack.last()
     fun topOrNull() = stack.lastOrNull()
+    fun bottom() = stack.first()
     fun bottomOrNull() = stack.firstOrNull()
 
     companion object {

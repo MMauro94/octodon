@@ -140,6 +140,7 @@ fun <T : NavigationDestination> StackNavigation(
     animationSpec: AnimationSpec<Float> = tween(450),
     manualAnimationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     modifier: Modifier = Modifier,
+    registerBackNavigation: Boolean = true,
     composable: @Composable (BoxScope.(T, state: ItemAnimatableState) -> Unit),
 ) {
     val items = rememberStackState(
@@ -149,5 +150,9 @@ fun <T : NavigationDestination> StackNavigation(
         animationSpec,
         manualAnimationSpec,
     )
-    StackNavigationUI(items, modifier, composable)
+    BackNavigationHandler(
+        goBack = { registerBackNavigation && stack.isNotEmpty() && dismiss(stack.top()) },
+    ) {
+        StackNavigationUI(items, modifier, composable)
+    }
 }

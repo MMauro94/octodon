@@ -34,6 +34,7 @@ import com.seiko.imageloader.LocalImageLoader
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.client.entities.PostView
+import io.github.mmauro94.common.client.entities.SortType
 import io.github.mmauro94.common.navigation.NavigationDestination
 import io.github.mmauro94.common.navigation.StackData
 import io.github.mmauro94.common.navigation.StackNavigation
@@ -68,8 +69,13 @@ fun App() {
 }
 
 sealed interface OctodonDestination : NavigationDestination {
-    class Feed(val serverLogin: ServerLogin) : OctodonDestination {
-        var feedRequest by mutableStateOf(FeedRequest.default())
+    class Feed(
+        val serverLogin: ServerLogin,
+        val type: ListingType,
+        val communityId: Long? = null,
+    ) : OctodonDestination {
+        var sort by mutableStateOf(SortType.HOT)
+        val feedRequest get() = FeedRequest(sort, type, communityId)
     }
 
     class Post(val serverLogin: ServerLogin, val post: PostView) : OctodonDestination
@@ -106,7 +112,7 @@ private fun AppContent() {
         remember(user) {
             stackData = StackData.of(
                 if (user != null) {
-                    OctodonDestination.Feed(user)
+                    OctodonDestination.Feed(user, ListingType.LOCAL)
                 } else {
                     OctodonDestination.AddServer
                 },
@@ -151,8 +157,14 @@ private fun AppContent() {
                                 selected = main.feedRequest.type == listingType,
                                 onClick = {
                                     cs.launch { drawerState.close() }
-                                    stackData = stackData.popUntil(main)
-                                    main.feedRequest = main.feedRequest.copy(type = listingType, communityId = null)
+                                    stackData = stackData
+                                        .popUntil(main)
+                                        .replace(
+                                            main,
+                                            OctodonDestination.Feed(main.serverLogin, listingType).apply {
+                                                sort = main.sort
+                                            },
+                                        )
                                 },
                                 icon = { Icon(listingType.icon, null) },
                             )

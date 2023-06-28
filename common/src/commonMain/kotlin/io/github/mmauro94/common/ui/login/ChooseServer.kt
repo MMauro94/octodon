@@ -91,6 +91,7 @@ fun ChooseServer(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Uri),
             keyboardActions = KeyboardActions(
                 onAny = {
+                    this.defaultKeyboardAction(ImeAction.Done)
                     cs.launch { workerChannel.send(WorkerMessage.Process(client)) }
                 },
             ),

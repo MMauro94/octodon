@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.client.api.GetSiteResponse
-import io.github.mmauro94.common.utils.Material3Markdown
+import io.github.mmauro94.common.markdown.ReadOnlyMarkdown
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -135,7 +135,7 @@ private fun ColumnScope.Info(title: String, content: String?) {
         Text(title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, modifier = modifier)
         Spacer(Modifier.height(8.dp))
         HighlightedElement(border = false) {
-            Material3Markdown(content)
+            ReadOnlyMarkdown(content)
         }
         Spacer(Modifier.height(16.dp))
     }

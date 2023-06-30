@@ -22,7 +22,7 @@ data class LocalSite(
     @SerialName("enable_downvotes") val enableDownvotes: Boolean,
     @SerialName("enable_nsfw") val enableNsfw: Boolean,
     @SerialName("federation_enabled") val federationEnabled: Boolean,
-    @SerialName("federation_worker_count") val federationWorkerCount: Int,
+    @SerialName("federation_worker_count") val federationWorkerCount: Int?,
     @SerialName("hide_modlog_mod_names") val hideModlogModNames: Boolean,
     @SerialName("legal_information") val legalInformation: String?,
     @SerialName("private_instance") val privateInstance: Boolean,

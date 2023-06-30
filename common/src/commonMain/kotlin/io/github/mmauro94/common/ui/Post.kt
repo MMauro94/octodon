@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberAsyncImagePainter
 import dev.icerock.moko.resources.compose.stringResource
@@ -57,7 +58,7 @@ private val LATERAL_PADDING = 8.dp
 fun Post(
     postView: PostView,
     onClick: (() -> Unit)?,
-    maxContentLines: Int = 4,
+    maxBodyHeight: Dp? = 128.dp,
 ) {
     Box(Modifier.padding(bottom = 12.dp)) {
         Surface(shadowElevation = 4.dp, tonalElevation = 4.dp) {
@@ -65,7 +66,7 @@ fun Post(
             if (onClick != null) modifier = modifier.clickable(onClick = onClick)
             Column(modifier.padding(top = 8.dp)) {
                 PostHeader(postView)
-                PostContent(postView, maxLines = maxContentLines)
+                PostContent(postView, maxBodyHeight = maxBodyHeight)
                 PostFooter(postView)
             }
         }
@@ -147,7 +148,7 @@ fun CommunityInfo(
 }
 
 @Composable
-fun ColumnScope.PostContent(postView: PostView, maxLines: Int = Int.MAX_VALUE) {
+fun ColumnScope.PostContent(postView: PostView, maxBodyHeight: Dp? = null) {
     when (val mediaInfo = postView.post.mediaInfo) {
         null -> {}
         is PostMediaInfo.Image -> {
@@ -165,19 +166,12 @@ fun ColumnScope.PostContent(postView: PostView, maxLines: Int = Int.MAX_VALUE) {
         }
     }
     if (!postView.post.body.isNullOrBlank()) {
-        Spacer(Modifier.height(8.dp))
-        Surface(
-            modifier = Modifier.padding(horizontal = LATERAL_PADDING).padding(top = 4.dp).fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            shape = MaterialTheme.shapes.extraSmall,
-        ) {
-            Box(Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
-                PostBody(
-                    body = postView.post.body,
-                    maxLines = maxLines,
-                )
-            }
-        }
+        Spacer(Modifier.height(12.dp))
+        PostBody(
+            modifier = Modifier.padding(horizontal = LATERAL_PADDING).fillMaxWidth(),
+            body = postView.post.body,
+            maxHeight = maxBodyHeight,
+        )
     }
 }
 

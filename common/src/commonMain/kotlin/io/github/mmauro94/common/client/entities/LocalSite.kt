@@ -26,7 +26,7 @@ data class LocalSite(
     @SerialName("hide_modlog_mod_names") val hideModlogModNames: Boolean,
     @SerialName("legal_information") val legalInformation: String?,
     @SerialName("private_instance") val privateInstance: Boolean,
-    @SerialName("published") val published: Instant,
+    val published: Instant,
     @SerialName("registration_mode") val registrationMode: RegistrationMode,
     @SerialName("reports_email_admins") val reportsEmailAdmins: Boolean,
     @SerialName("require_email_verification") val requireEmailVerification: Boolean,

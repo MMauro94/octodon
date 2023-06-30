@@ -12,7 +12,6 @@ import androidx.compose.ui.text.UrlAnnotation
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
@@ -46,20 +45,9 @@ import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
 import org.commonmark.parser.Parser
 
-
-sealed interface MarkdownElement {
-    data class Text(val text: AnnotatedString, val style: TextStyle) : MarkdownElement
-    data class Quote(val content: List<MarkdownElement>) : MarkdownElement
-    data class CodeBlock(val text: String) : MarkdownElement
-    data class ListItem(val bullet: String, val content: List<MarkdownElement>) : MarkdownElement
-    data class Image(val url: String, val title: String?) : MarkdownElement
-    object Divider : MarkdownElement
-    data class Spacer(val height: Dp = 16.dp) : MarkdownElement
-    data class Table(val text: String) : MarkdownElement //TODO
-}
-
+@Suppress("TooManyFunctions")
 @OptIn(ExperimentalTextApi::class)
-private class MarkdownElementsBuilder(
+private class MarkdownParser(
     val plainText: String,
     val typography: Typography,
     val codeBackground: Color,
@@ -141,7 +129,7 @@ private class MarkdownElementsBuilder(
         andNext: Boolean = true,
         addDecorativeSpaces: Boolean = this.addDecorativeSpaces,
     ): List<MarkdownElement> {
-        return MarkdownElementsBuilder(plainText, typography, codeBackground, linkColor, addDecorativeSpaces)
+        return MarkdownParser(plainText, typography, codeBackground, linkColor, addDecorativeSpaces)
             .parse(node, andNext = andNext)
     }
 
@@ -249,7 +237,11 @@ private class MarkdownElementsBuilder(
         var n: Node? = block.firstChild
         var index = 1
         while (n != null) {
-            val children = nestedParsing(n, andNext = false, addDecorativeSpaces = addDecorativeSpaces && !block.isTight)
+            val children = nestedParsing(
+                n,
+                andNext = false,
+                addDecorativeSpaces = addDecorativeSpaces && !block.isTight,
+            )
             addElement(
                 MarkdownElement.ListItem(
                     prefix(index++),
@@ -313,7 +305,7 @@ private val parser: Parser = Parser.builder()
 @Composable
 fun parse(markdown: String): List<MarkdownElement> {
     val node = parser.parse(markdown)
-    return MarkdownElementsBuilder(
+    return MarkdownParser(
         markdown,
         typography = MaterialTheme.typography,
         codeBackground = codeBackgroundColor(),

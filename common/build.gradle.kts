@@ -40,7 +40,14 @@ kotlin {
                 implementation(libs.ktor.serialization.kotlinx.json)
 
                 implementation(libs.imageLoader)
-                implementation(libs.markdownParser)
+
+                // Markdown
+                implementation(libs.commonmark)
+                implementation(libs.commonmark.tables)
+                implementation(libs.commonmark.autolink)
+                implementation(libs.commonmark.strikethrough)
+                implementation(libs.commonmark.images)
+                implementation(libs.commonmark.taskList)
 
                 // Database
                 implementation(libs.sqldelight.adapters.primitive)

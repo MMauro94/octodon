@@ -55,7 +55,7 @@ internal fun LoginStepContainer(
                 .align(Alignment.Center)
                 .widthIn(max = 640.dp)
                 .fillMaxHeight()
-                .padding(horizontal = 32.dp)
+                .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

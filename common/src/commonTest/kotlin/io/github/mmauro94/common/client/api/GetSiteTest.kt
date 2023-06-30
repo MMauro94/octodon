@@ -13,6 +13,7 @@ class GetSiteTest : FunSpec(
                 "get_site_1",
                 "get_site_2",
                 "get_site_3",
+                "get_site_4",
             ) { fileName ->
                 getMockedLemmyClient(fileName).getSite().shouldBeInstanceOf<Result.Success<*>>()
             }

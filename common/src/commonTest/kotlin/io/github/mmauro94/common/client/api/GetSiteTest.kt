@@ -5,15 +5,16 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.types.shouldBeInstanceOf
 
-class GetPostsTest : FunSpec(
+class GetSiteTest : FunSpec(
     {
 
         context("getPosts is able to parse a sample response") {
             withData(
-                "get_posts_1",
-                "get_posts_2",
+                "get_site_1",
+                "get_site_2",
+                "get_site_3",
             ) { fileName ->
-                getMockedLemmyClient(fileName).getPosts().shouldBeInstanceOf<Result.Success<*>>()
+                getMockedLemmyClient(fileName).getSite().shouldBeInstanceOf<Result.Success<*>>()
             }
         }
     },

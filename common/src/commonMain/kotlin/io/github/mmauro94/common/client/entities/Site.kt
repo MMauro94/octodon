@@ -1,27 +1,24 @@
-@file:UseSerializers(InstantSerializer::class)
-
 package io.github.mmauro94.common.client.entities
 
-import io.github.mmauro94.common.serializers.InstantSerializer
-import kotlinx.datetime.Instant
+import io.github.mmauro94.common.client.ParsableInstant
+import io.github.mmauro94.common.client.ParsableUrl
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class Site(
     val id: Long,
-    @SerialName("actor_id") val actorId: String,
-    val banner: String?,
+    @SerialName("actor_id") val actorId: ParsableUrl,
+    val banner: ParsableUrl?,
     val description: String?,
-    val icon: String?,
-    @SerialName("inbox_url") val inboxUrl: String,
+    val icon: ParsableUrl?,
+    @SerialName("inbox_url") val inboxUrl: ParsableUrl,
     @SerialName("instance_id") val instanceId: Long,
-    @SerialName("last_refreshed_at") val lastRefreshedAt: Instant,
+    @SerialName("last_refreshed_at") val lastRefreshedAt: ParsableInstant,
     val name: String,
     @SerialName("private_key") val privateKey: String?,
     @SerialName("public_key") val publicKey: String,
-    val published: Instant,
+    val published: ParsableInstant,
     val sidebar: String?,
-    val updated: Instant?,
+    val updated: ParsableInstant?,
 )

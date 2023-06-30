@@ -1,44 +1,77 @@
 package io.github.mmauro94.common.markdown
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.UrlAnnotation
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import org.intellij.markdown.MarkdownElementTypes
-import org.intellij.markdown.MarkdownTokenTypes
-import org.intellij.markdown.ast.ASTNode
-import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
-import org.intellij.markdown.parser.MarkdownParser
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import org.commonmark.Extension
+import org.commonmark.ext.autolink.AutolinkExtension
+import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
+import org.commonmark.ext.gfm.tables.TablesExtension
+import org.commonmark.ext.image.attributes.ImageAttributesExtension
+import org.commonmark.ext.task.list.items.TaskListItemsExtension
+import org.commonmark.node.AbstractVisitor
+import org.commonmark.node.BlockQuote
+import org.commonmark.node.BulletList
+import org.commonmark.node.Code
+import org.commonmark.node.CustomBlock
+import org.commonmark.node.CustomNode
+import org.commonmark.node.Emphasis
+import org.commonmark.node.FencedCodeBlock
+import org.commonmark.node.HardLineBreak
+import org.commonmark.node.Heading
+import org.commonmark.node.HtmlBlock
+import org.commonmark.node.HtmlInline
+import org.commonmark.node.Image
+import org.commonmark.node.IndentedCodeBlock
+import org.commonmark.node.Link
+import org.commonmark.node.LinkReferenceDefinition
+import org.commonmark.node.ListBlock
+import org.commonmark.node.Node
+import org.commonmark.node.OrderedList
+import org.commonmark.node.Paragraph
+import org.commonmark.node.SoftLineBreak
+import org.commonmark.node.StrongEmphasis
+import org.commonmark.node.Text
+import org.commonmark.node.ThematicBreak
+import org.commonmark.parser.Parser
+
 
 sealed interface MarkdownElement {
     data class Text(val text: AnnotatedString, val style: TextStyle) : MarkdownElement
-    data class Quote(val text: AnnotatedString) : MarkdownElement
+    data class Quote(val content: List<MarkdownElement>) : MarkdownElement
     data class CodeBlock(val text: String) : MarkdownElement
-    data class Image(val url: String) : MarkdownElement
+    data class ListItem(val bullet: String, val content: List<MarkdownElement>) : MarkdownElement
+    data class Image(val url: String, val title: String?) : MarkdownElement
     object Divider : MarkdownElement
+    data class Spacer(val height: Dp = 16.dp) : MarkdownElement
     data class Table(val text: String) : MarkdownElement //TODO
 }
 
 @OptIn(ExperimentalTextApi::class)
-private class MarkdownElementsBuilder {
+private class MarkdownElementsBuilder(
+    val plainText: String,
+    val typography: Typography,
+    val codeBackground: Color,
+    val linkColor: Color,
+    val addDecorativeSpaces: Boolean = true,
+) : AbstractVisitor() {
 
-    val elements = mutableListOf<MarkdownElement>()
-    val stylesStack = mutableListOf<Pair<SpanStyle, Int>>()
-    val urlAnnotationsStack = mutableListOf<Pair<UrlAnnotation, Int>>()
-    var currentString: AnnotatedString.Builder = AnnotatedString.Builder()
-    var skipNextNewLine = false
-
-    private sealed interface TextMode {
-        data class Normal(val style: TextStyle? = null) : TextMode
-        object Quote : TextMode
-    }
-
-    private var currentMode: TextMode = TextMode.Normal()
+    private val elements = mutableListOf<MarkdownElement>()
+    private val stylesStack = mutableListOf<Pair<SpanStyle, Int>>()
+    private val urlAnnotationsStack = mutableListOf<Pair<UrlAnnotation, Int>>()
+    private var currentString: AnnotatedString.Builder = AnnotatedString.Builder()
+    private var currentStyle: TextStyle = typography.bodyMedium
 
     private fun pushStyle(style: SpanStyle) {
         stylesStack.add(style to currentString.length)
@@ -58,8 +91,7 @@ private class MarkdownElementsBuilder {
         currentString.addUrlAnnotation(style, actualStart, currentString.length)
     }
 
-    @Composable
-    private fun commitString(newMode: TextMode) {
+    private fun commitString(newStyle: TextStyle = typography.bodyMedium) {
         if (currentString.length > 0) {
             stylesStack.forEach { (style, start) ->
                 currentString.addStyle(style, start, currentString.length)
@@ -68,208 +100,223 @@ private class MarkdownElementsBuilder {
                 currentString.addUrlAnnotation(url, start, currentString.length)
             }
             elements.add(
-                when (val mode = currentMode) {
-                    is TextMode.Normal -> MarkdownElement.Text(
-                        currentString.toAnnotatedString(),
-                        mode.style ?: MaterialTheme.typography.bodyMedium,
-                    )
-
-                    TextMode.Quote -> MarkdownElement.Quote(currentString.toAnnotatedString())
-                },
+                MarkdownElement.Text(currentString.toAnnotatedString(), currentStyle),
             )
         }
-        skipNextNewLine = true
         currentString = AnnotatedString.Builder()
-        currentMode = newMode
+        currentStyle = newStyle
         stylesStack.replaceAll { (style, _) -> style to 0 }
         urlAnnotationsStack.replaceAll { (style, _) -> style to 0 }
     }
 
     private fun addText(text: String) {
-        if (!skipNextNewLine || text != "\n") {
-            currentString.append(text)
-        }
-        skipNextNewLine = false
+        currentString.append(text)
     }
 
-    @Composable
-    fun parse(node: ASTNode, plainText: String) {
-        addNode(node, plainText)
-        commitString(TextMode.Normal())
+    private fun ensureWhitespace() {
+        // TODO: only if there's not already a whitespace
+        addText(" ")
     }
 
-    @Composable
-    private fun addNode(node: ASTNode, plainText: String) {
-        @Composable
-        fun children(children: List<ASTNode>) {
-            children.forEach {
-                addNode(it, plainText)
-            }
+    private fun addElement(element: MarkdownElement) {
+        commitString()
+        elements.add(element)
+    }
+
+    fun parse(node: Node, andNext: Boolean = true): List<MarkdownElement> {
+        var n: Node? = node
+        while (n != null) {
+            n.accept(this)
+            n = n.next
+            if (!andNext) break
         }
+        commitString()
+        return elements
+            .dropLastWhile { it is MarkdownElement.Spacer }
+            .dropWhile { it is MarkdownElement.Spacer }
+    }
 
-        @Composable
-        fun inlineStyleChildren(style: SpanStyle, children: List<ASTNode>) {
-            pushStyle(style)
-            children(children)
-            popStyle()
+    private fun nestedParsing(
+        node: Node,
+        andNext: Boolean = true,
+        addDecorativeSpaces: Boolean = this.addDecorativeSpaces,
+    ): List<MarkdownElement> {
+        return MarkdownElementsBuilder(plainText, typography, codeBackground, linkColor, addDecorativeSpaces)
+            .parse(node, andNext = andNext)
+    }
+
+    override fun visit(blockQuote: BlockQuote) {
+        addElement(MarkdownElement.Quote(nestedParsing(blockQuote.firstChild)))
+        if (addDecorativeSpaces) {
+            addElement(MarkdownElement.Spacer())
         }
+    }
 
-        @Composable
-        fun styleChildren(style: TextStyle, children: List<ASTNode>) {
-            commitString(TextMode.Normal(style))
-            children(children)
-            commitString(TextMode.Normal())
+    override fun visit(code: Code) {
+        pushStyle(SpanStyle(fontFamily = FontFamily.Monospace, background = codeBackground))
+        addText(code.literal)
+        popStyle()
+    }
+
+    override fun visit(emphasis: Emphasis) {
+        pushStyle(SpanStyle(fontStyle = FontStyle.Italic))
+        super.visit(emphasis)
+        popStyle()
+    }
+
+    override fun visit(fencedCodeBlock: FencedCodeBlock) {
+        addElement(MarkdownElement.CodeBlock(fencedCodeBlock.literal.removeSuffix("\n")))
+        addElement(MarkdownElement.Spacer())
+    }
+
+    override fun visit(hardLineBreak: HardLineBreak) {
+        commitString()
+    }
+
+    override fun visit(heading: Heading) {
+        addElement(
+            MarkdownElement.Spacer(
+                when (heading.level) {
+                    1 -> 16.dp
+                    2 -> 8.dp
+                    else -> 4.dp
+                },
+            ),
+        )
+        val style = when (heading.level) {
+            1 -> typography.headlineLarge
+            2 -> typography.headlineMedium
+            3 -> typography.headlineSmall
+            4 -> typography.titleLarge
+            5 -> typography.titleMedium
+            6 -> typography.titleSmall
+            7 -> typography.bodyLarge
+            else -> typography.bodyMedium
         }
+        commitString(style)
+        super.visit(heading)
+        addElement(
+            MarkdownElement.Spacer(
+                when (heading.level) {
+                    1 -> 8.dp
+                    2 -> 4.dp
+                    else -> 2.dp
+                },
+            ),
+        )
+    }
 
-        @Composable
-        fun styleATX(style: TextStyle) {
-            styleChildren(style, node.childOfType(MarkdownTokenTypes.ATX_CONTENT)?.children?.trim() ?: node.children)
+    override fun visit(thematicBreak: ThematicBreak) {
+        addElement(MarkdownElement.Divider)
+    }
+
+    override fun visit(htmlInline: HtmlInline) {
+        super.visit(htmlInline)
+    }
+
+    override fun visit(htmlBlock: HtmlBlock) {
+        super.visit(htmlBlock)
+    }
+
+    override fun visit(image: Image) {
+        addElement(MarkdownElement.Image(image.destination, image.title))
+    }
+
+    override fun visit(indentedCodeBlock: IndentedCodeBlock) {
+        addElement(MarkdownElement.CodeBlock(indentedCodeBlock.literal.removeSuffix("\n")))
+        addElement(MarkdownElement.Spacer())
+    }
+
+    override fun visit(link: Link) {
+        pushStyle(SpanStyle(color = linkColor))
+        pushUrlAnnotation(UrlAnnotation(link.destination))
+        super.visit(link)
+        popUrlAnnotation()
+        popStyle()
+    }
+
+    override fun visit(bulletList: BulletList) {
+        renderList(bulletList) { "• " }
+    }
+
+    override fun visit(orderedList: OrderedList) {
+        renderList(orderedList) { n ->
+            "${n + orderedList.startNumber - 1}. "
         }
+    }
 
-        @Composable
-        fun list(prefix: (n: Int) -> String) {
-            var n = 1
-            node.children.forEach { child ->
-                if (child.type == MarkdownElementTypes.LIST_ITEM) {
-                    addText(prefix(n++))
-                    children(child.children.drop(1))
-                } else addNode(child, plainText)
-            }
-        }
-
-        when (node.type) {
-            MarkdownTokenTypes.TEXT -> {
-                addText(node.stringContent(plainText).replace("\n", " "))
-            }
-
-            MarkdownElementTypes.IMAGE -> {
-                commitString(TextMode.Normal())
-                val url = node.childOfType(MarkdownElementTypes.LINK_DESTINATION)?.stringContent(plainText)
-                if (url != null) {
-                    elements.add(MarkdownElement.Image(url))
-                }
-            }
-
-            MarkdownElementTypes.UNORDERED_LIST -> {
-                list { "• " }
-            }
-
-            MarkdownElementTypes.ORDERED_LIST -> {
-                list { "$it. " }
-            }
-
-            MarkdownElementTypes.BLOCK_QUOTE -> {
-                commitString(TextMode.Quote)
-                children(node.children.trim(MarkdownTokenTypes.BLOCK_QUOTE))
-                commitString(TextMode.Normal())
-            }
-
-            MarkdownElementTypes.CODE_FENCE -> {
-                commitString(TextMode.Normal())
-                val content = node.childOfType(MarkdownTokenTypes.CODE_FENCE_CONTENT)?.stringContent(plainText)
-                elements.add(MarkdownElement.CodeBlock(content.orEmpty()))
-            }
-
-            MarkdownElementTypes.CODE_BLOCK -> {
-                //TODO
-                addText("```")
-                children(node.children)
-                addText("```")
-            }
-
-            MarkdownElementTypes.CODE_SPAN -> {
-                //TODO
-                addText("`")
-                children(node.children)
-                addText("`")
-            }
-
-            MarkdownElementTypes.HTML_BLOCK -> {
-                //TODO
-                addText("<html>")
-                children(node.children)
-                addText("</html>")
-            }
-
-            MarkdownElementTypes.PARAGRAPH -> {
-                children(node.children)
-            }
-
-            MarkdownElementTypes.LINK_DEFINITION -> {
-                val linkLabel = node.childOfType(MarkdownElementTypes.LINK_LABEL)?.stringContent(plainText)
-                if (linkLabel != null) {
-                    val destination = node.childOfType(MarkdownElementTypes.LINK_DESTINATION)?.stringContent(plainText)
-                    if (destination == null) {
-                        addText(linkLabel)
-                    } else {
-                        pushUrlAnnotation(UrlAnnotation(destination))
-                        addText(linkLabel)
-                        popUrlAnnotation()
-                    }
-                }
-            }
-
-            MarkdownElementTypes.INLINE_LINK -> {
-                val linkTextNode = node.childOfType(MarkdownElementTypes.LINK_TEXT)?.children.orEmpty().dropLast(1).drop(1)
-                if (linkTextNode.isNotEmpty()) {
-                    val destination = node.childOfType(MarkdownElementTypes.LINK_DESTINATION)?.stringContent(plainText)
-                    if (destination == null) {
-                        linkTextNode.forEach { addNode(it, plainText) }
-                    } else {
-                        pushUrlAnnotation(UrlAnnotation(destination))
-                        pushStyle(SpanStyle(color = MaterialTheme.colorScheme.primary))
-                        linkTextNode.forEach { addNode(it, plainText) }
-                        popStyle()
-                        popUrlAnnotation()
-                    }
-                }
-            }
-
-            MarkdownElementTypes.AUTOLINK -> {
-                val link = node.stringContent(plainText)
-                pushUrlAnnotation(UrlAnnotation(link))
-                pushStyle(SpanStyle(color = MaterialTheme.colorScheme.primary))
-                addText(link)
-                popStyle()
-                popUrlAnnotation()
-            }
-
-            MarkdownElementTypes.EMPH -> inlineStyleChildren(
-                SpanStyle(fontStyle = FontStyle.Italic),
-                node.children.trim(MarkdownTokenTypes.EMPH),
+    private fun renderList(block: ListBlock, prefix: (Int) -> String) {
+        var n: Node? = block.firstChild
+        var index = 1
+        while (n != null) {
+            val children = nestedParsing(n, andNext = false, addDecorativeSpaces = addDecorativeSpaces && !block.isTight)
+            addElement(
+                MarkdownElement.ListItem(
+                    prefix(index++),
+                    children,
+                ),
             )
-
-            MarkdownElementTypes.STRONG -> inlineStyleChildren(
-                SpanStyle(fontWeight = FontWeight.Bold),
-                node.children.trim(MarkdownTokenTypes.EMPH),
-            )
-
-            MarkdownElementTypes.SETEXT_1 -> styleChildren(MaterialTheme.typography.headlineLarge, node.children)
-            MarkdownElementTypes.ATX_1 -> styleATX(MaterialTheme.typography.headlineLarge)
-            MarkdownElementTypes.SETEXT_2 -> styleChildren(MaterialTheme.typography.headlineMedium, node.children)
-            MarkdownElementTypes.ATX_2 -> styleATX(MaterialTheme.typography.headlineMedium)
-            MarkdownElementTypes.ATX_3 -> styleATX(MaterialTheme.typography.headlineSmall)
-            MarkdownElementTypes.ATX_4 -> styleATX(MaterialTheme.typography.titleLarge)
-            MarkdownElementTypes.ATX_5 -> styleATX(MaterialTheme.typography.titleMedium)
-            MarkdownElementTypes.ATX_6 -> styleATX(MaterialTheme.typography.titleSmall)
-
-            else -> {
-                if (node.children.isEmpty()) {
-                    addText(node.stringContent(plainText))
-                } else {
-                    children(node.children)
-                }
-            }
+            n = n.next
         }
+        if (addDecorativeSpaces) {
+            addElement(MarkdownElement.Spacer())
+        }
+    }
+
+    override fun visit(paragraph: Paragraph) {
+        super.visit(paragraph)
+        if (addDecorativeSpaces) {
+            addElement(MarkdownElement.Spacer())
+        } else {
+            commitString()
+        }
+    }
+
+    override fun visit(softLineBreak: SoftLineBreak) {
+        ensureWhitespace()
+    }
+
+    override fun visit(strongEmphasis: StrongEmphasis) {
+        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+        super.visit(strongEmphasis)
+        popStyle()
+    }
+
+    override fun visit(text: Text) {
+        addText(text.literal)
+    }
+
+    override fun visit(linkReferenceDefinition: LinkReferenceDefinition) {
+    }
+
+    override fun visit(customBlock: CustomBlock) {
+        super.visit(customBlock)
+        addElement(MarkdownElement.Spacer())
+    }
+
+    override fun visit(customNode: CustomNode) {
+        super.visit(customNode)
     }
 }
 
-private val parser = MarkdownParser(CommonMarkFlavourDescriptor())
+private val extensions: List<Extension> = listOf(
+    TablesExtension.create(),
+    AutolinkExtension.create(),
+    StrikethroughExtension.create(),
+    ImageAttributesExtension.create(),
+    TaskListItemsExtension.create(),
+)
+private val parser: Parser = Parser.builder()
+    .extensions(extensions)
+    .build()
 
 @Composable
 fun parse(markdown: String): List<MarkdownElement> {
-    val node = parser.buildMarkdownTreeFromString(markdown)
-    return MarkdownElementsBuilder().apply {
-        parse(node, markdown)
-    }.elements
+    val node = parser.parse(markdown)
+    return MarkdownElementsBuilder(
+        markdown,
+        typography = MaterialTheme.typography,
+        codeBackground = codeBackgroundColor(),
+        linkColor = MaterialTheme.colorScheme.primary,
+    ).parse(node)
 }

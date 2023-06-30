@@ -7,6 +7,7 @@ ktor = "2.3.1"
 moko = "0.23.0"
 imageLoader = "1.5.1"
 sqldelight = "2.0.0-rc01"
+commonmark = "0.21.0"
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -33,7 +34,12 @@ sqldelight-extensions-async = { module = "app.cash.sqldelight:async-extensions",
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 
-markdownParser = { module = "org.jetbrains:markdown", version = "0.4.1"}
+commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark"}
+commonmark-tables = { module = "org.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark"}
+commonmark-autolink = { module = "org.commonmark:commonmark-ext-autolink", version.ref = "commonmark"}
+commonmark-strikethrough = { module = "org.commonmark:commonmark-ext-gfm-strikethrough", version.ref = "commonmark"}
+commonmark-images = { module = "org.commonmark:commonmark-ext-image-attributes", version.ref = "commonmark"}
+commonmark-taskList = { module = "org.commonmark:commonmark-ext-task-list-items", version.ref = "commonmark"}
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

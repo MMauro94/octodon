@@ -1,5 +1,7 @@
 package io.github.mmauro94.common.client
 
+import io.github.mmauro94.common.serializers.InstantSerializer
+import io.github.mmauro94.common.serializers.UrlSerializer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.HttpClientEngineConfig
@@ -11,6 +13,8 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 
 /**
  * For list of types [https://join-lemmy.org/api/modules.html](https://join-lemmy.org/api/modules.html)
@@ -47,6 +51,11 @@ class LemmyClient(
                         ignoreUnknownKeys = true
                         explicitNulls = false
                         coerceInputValues = true
+
+                        serializersModule = SerializersModule {
+                            contextual(InstantSerializer)
+                            contextual(UrlSerializer)
+                        }
                     },
                 )
             }

@@ -1,12 +1,8 @@
-@file:UseSerializers(InstantSerializer::class)
-
 package io.github.mmauro94.common.client.entities
 
-import io.github.mmauro94.common.serializers.InstantSerializer
-import kotlinx.datetime.Instant
+import io.github.mmauro94.common.client.ParsableInstant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class LocalSite(
@@ -26,12 +22,12 @@ data class LocalSite(
     @SerialName("hide_modlog_mod_names") val hideModlogModNames: Boolean,
     @SerialName("legal_information") val legalInformation: String?,
     @SerialName("private_instance") val privateInstance: Boolean,
-    val published: Instant,
+    val published: ParsableInstant,
     @SerialName("registration_mode") val registrationMode: RegistrationMode,
     @SerialName("reports_email_admins") val reportsEmailAdmins: Boolean,
     @SerialName("require_email_verification") val requireEmailVerification: Boolean,
     @SerialName("site_id") val siteId: Long,
     @SerialName("site_setup") val siteSetup: Boolean,
     @SerialName("slur_filter_regex") val slurFilterRegex: String?,
-    @SerialName("updated") val updated: Instant?,
+    val updated: ParsableInstant?,
 )

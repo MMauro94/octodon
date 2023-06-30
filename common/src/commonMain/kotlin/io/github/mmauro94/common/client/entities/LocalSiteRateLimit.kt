@@ -1,12 +1,8 @@
-@file:UseSerializers(InstantSerializer::class)
-
 package io.github.mmauro94.common.client.entities
 
-import io.github.mmauro94.common.serializers.InstantSerializer
-import kotlinx.datetime.Instant
+import io.github.mmauro94.common.client.ParsableInstant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class LocalSiteRateLimit(
@@ -24,6 +20,6 @@ data class LocalSiteRateLimit(
     @SerialName("register_per_second") val registerPerSecond: Long,
     val search: Int,
     @SerialName("search_per_second") val searchPerSecond: Long,
-    val published: Instant,
-    val updated: Instant?,
+    val published: ParsableInstant,
+    val updated: ParsableInstant?,
 )

@@ -1,12 +1,8 @@
-@file:UseSerializers(InstantSerializer::class)
-
 package io.github.mmauro94.common.client.entities
 
-import io.github.mmauro94.common.serializers.InstantSerializer
-import kotlinx.datetime.Instant
+import io.github.mmauro94.common.client.ParsableInstant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class LocalUser(
@@ -27,5 +23,5 @@ data class LocalUser(
     @SerialName("show_scores") val showScores: Boolean,
     val theme: String,
     @SerialName("totp_2fa_url") val totp2FaUrl: String?,
-    @SerialName("validator_time") val validatorTime: Instant,
+    @SerialName("validator_time") val validatorTime: ParsableInstant,
 )

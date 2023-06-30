@@ -1,12 +1,8 @@
-@file:UseSerializers(InstantSerializer::class)
-
 package io.github.mmauro94.common.client.entities
 
-import io.github.mmauro94.common.serializers.InstantSerializer
-import kotlinx.datetime.Instant
+import io.github.mmauro94.common.client.ParsableInstant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class PostView(
@@ -31,9 +27,9 @@ data class PostView(
         val score: Int,
         val upvotes: Int,
         val downvotes: Int,
-        val published: Instant,
-        @SerialName("newest_comment_time_necro") val newestCommentTimeNecro: Instant?,
-        @SerialName("newest_comment_time") val newestCommentTime: Instant?,
+        val published: ParsableInstant,
+        @SerialName("newest_comment_time_necro") val newestCommentTimeNecro: ParsableInstant?,
+        @SerialName("newest_comment_time") val newestCommentTime: ParsableInstant?,
         @SerialName("featured_community") val featuredCommunity: Boolean,
         @SerialName("featured_local") val featuredLocal: Boolean,
         @SerialName("hot_rank") val hotRank: Int,

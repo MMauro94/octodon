@@ -109,7 +109,7 @@ fun PostHeader(postView: PostView) {
                 Spacer(Modifier.width(8.dp))
                 Surface(Modifier.size(64.dp), shape = MaterialTheme.shapes.extraSmall) {
                     if (postView.post.thumbnailUrl != null) {
-                        val painter = rememberAsyncImagePainter(postView.post.thumbnailUrl)
+                        val painter = rememberAsyncImagePainter(postView.post.thumbnailUrl.toString())
                         Image(
                             painter = painter,
                             contentDescription = null,
@@ -152,7 +152,7 @@ fun ColumnScope.PostContent(postView: PostView, maxLines: Int = Int.MAX_VALUE) {
         null -> {}
         is PostMediaInfo.Image -> {
             Spacer(Modifier.height(16.dp))
-            val painter = rememberAsyncImagePainter(mediaInfo.thumbnailUrl)
+            val painter = rememberAsyncImagePainter(mediaInfo.thumbnailUrl.toString())
             // TODO handle image loading (now height is at 0)
             // TODO handle image download errors
             // TODO seems to not work with webp

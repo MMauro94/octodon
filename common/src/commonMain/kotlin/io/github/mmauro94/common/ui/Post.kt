@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -97,6 +98,20 @@ fun PostHeader(postView: PostView) {
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceLowlighted,
             )
+            if (postView.post.url != null) {
+                Text(
+                    text = "•",
+                    modifier = Modifier.padding(horizontal = 2.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceLowlighted,
+                )
+                Text(
+                    text = postView.post.url.host.removePrefix("www."),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceLowlighted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
         Spacer(Modifier.height(4.dp))
         Row {
@@ -109,7 +124,11 @@ fun PostHeader(postView: PostView) {
             )
             if (postView.post.url != null && postView.post.mediaInfo == null) {
                 Spacer(Modifier.width(8.dp))
-                Surface(Modifier.size(64.dp), shape = MaterialTheme.shapes.extraSmall) {
+                val uriHandler = LocalUriHandler.current
+                Surface(
+                    Modifier.size(64.dp).clickable { uriHandler.openUri(postView.post.url.toString()) },
+                    shape = MaterialTheme.shapes.extraSmall,
+                ) {
                     if (postView.post.thumbnailUrl != null) {
                         val painter = rememberAsyncImagePainter(postView.post.thumbnailUrl.toString())
                         Image(
@@ -200,7 +219,14 @@ fun PostFooter(postView: PostView) {
         )
         FooterIcon({}, icon = Icons.Default.ArrowDownward, stringResource(MR.strings.downvote_action))
         FooterIcon({}, icon = Icons.Default.BookmarkBorder, stringResource(MR.strings.save_action))
-        FooterIcon({}, icon = Icons.Default.OpenInBrowser, stringResource(MR.strings.open_in_browser))
+        if (postView.post.url != null) {
+            val uriHandler = LocalUriHandler.current
+            FooterIcon(
+                onClick = { uriHandler.openUri(postView.post.url.toString()) },
+                icon = Icons.Default.OpenInBrowser,
+                contentDescription = stringResource(MR.strings.open_in_browser),
+            )
+        }
         FooterIcon({}, icon = Icons.Default.MoreVert, stringResource(MR.strings.more_options))
     }
 }

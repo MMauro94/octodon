@@ -17,5 +17,5 @@ fun Any.getMockedLemmyClient(fileName: String): LemmyClient {
             headers = headersOf(HttpHeaders.ContentType, "application/json"),
         )
     }
-    return LemmyClient("", mockEngine)
+    return LemmyClient("", null, mockEngine)
 }

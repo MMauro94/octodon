@@ -58,6 +58,7 @@ private val LATERAL_PADDING = 8.dp
 fun Post(
     postView: PostView,
     onClick: (() -> Unit)?,
+    enableBodyClicks: Boolean = false,
     maxBodyHeight: Dp? = 128.dp,
 ) {
     Box(Modifier.padding(bottom = 12.dp)) {
@@ -66,7 +67,7 @@ fun Post(
             if (onClick != null) modifier = modifier.clickable(onClick = onClick)
             Column(modifier.padding(top = 8.dp)) {
                 PostHeader(postView)
-                PostContent(postView, maxBodyHeight = maxBodyHeight)
+                PostContent(postView, maxBodyHeight = maxBodyHeight, enableBodyClicks = enableBodyClicks)
                 PostFooter(postView)
             }
         }
@@ -148,7 +149,7 @@ fun CommunityInfo(
 }
 
 @Composable
-fun ColumnScope.PostContent(postView: PostView, maxBodyHeight: Dp? = null) {
+fun ColumnScope.PostContent(postView: PostView, enableBodyClicks: Boolean, maxBodyHeight: Dp? = null) {
     when (val mediaInfo = postView.post.mediaInfo) {
         null -> {}
         is PostMediaInfo.Image -> {
@@ -170,6 +171,7 @@ fun ColumnScope.PostContent(postView: PostView, maxBodyHeight: Dp? = null) {
         PostBody(
             modifier = Modifier.padding(horizontal = LATERAL_PADDING).fillMaxWidth(),
             body = postView.post.body,
+            enableClicks = enableBodyClicks,
             maxHeight = maxBodyHeight,
         )
     }

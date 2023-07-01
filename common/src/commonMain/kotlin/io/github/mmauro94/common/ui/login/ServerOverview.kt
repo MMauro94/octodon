@@ -135,7 +135,7 @@ private fun ColumnScope.Info(title: String, content: String?) {
         Text(title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, modifier = modifier)
         Spacer(Modifier.height(8.dp))
         HighlightedElement(border = false) {
-            ReadOnlyMarkdown(content)
+            ReadOnlyMarkdown(content, enableClicks = true)
         }
         Spacer(Modifier.height(16.dp))
     }

@@ -41,7 +41,7 @@ fun PostScreen(
                 title = { Text(stringResource(MR.strings.comments)) },
             )
             Box(Modifier.verticalScroll(rememberScrollState())) {
-                Post(destination.post, onClick = null, maxBodyHeight = null)
+                Post(destination.post, onClick = null, maxBodyHeight = null, enableBodyClicks = true)
             }
         }
     }

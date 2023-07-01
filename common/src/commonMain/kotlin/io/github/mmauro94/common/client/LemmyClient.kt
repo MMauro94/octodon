@@ -7,6 +7,7 @@ import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -21,11 +22,13 @@ import kotlinx.serialization.modules.contextual
  */
 class LemmyClient(
     val url: String,
+    private val token: String? = null,
     engineFactory: HttpClientEngineFactory<*> = OkHttp,
 ) {
 
-    constructor(url: String, engine: HttpClientEngine) : this(
+    constructor(url: String, token: String?, engine: HttpClientEngine) : this(
         url = url,
+        token = token,
         engineFactory = object : HttpClientEngineFactory<HttpClientEngineConfig> {
             override fun create(block: HttpClientEngineConfig.() -> Unit): HttpClientEngine {
                 return engine
@@ -43,6 +46,11 @@ class LemmyClient(
             install(ContentEncoding) {
                 deflate(1.0f)
                 gzip(0.9f)
+            }
+            install(Auth) {
+                if (token != null) {
+                    lemmyAuth(token)
+                }
             }
             install(ContentNegotiation) {
                 json(

@@ -21,9 +21,8 @@ fun FeedScreen(
     onPostClick: (PostView) -> Unit,
     openDrawer: () -> Unit,
 ) {
-    // TODO: use login information
-    val client = remember(destination.serverLogin.serverUrl) {
-        LemmyClient(destination.serverLogin.serverUrl)
+    val client = remember(destination.serverLogin.serverUrl, destination.serverLogin.token) {
+        LemmyClient(destination.serverLogin.serverUrl, destination.serverLogin.token)
     }
     ScreenContainer(screenState) { width, height ->
         Column(Modifier.fillMaxSize()) {

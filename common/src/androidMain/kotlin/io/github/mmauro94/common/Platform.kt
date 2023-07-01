@@ -30,9 +30,16 @@ actual fun PlatformVerticalScrollbar(
 @Composable
 actual fun generateImageLoader(): ImageLoader {
     val context = LocalContext.current
+    val maxSize = maxOf(
+        context.resources.displayMetrics.heightPixels,
+        context.resources.displayMetrics.widthPixels,
+    )
     return ImageLoader {
+        options {
+            allowInexactSize = true
+        }
         components {
-            setupDefaultComponents(context)
+            setupDefaultComponents(context, maxImageSize = maxSize)
         }
         interceptor {
             memoryCacheConfig {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,12 +43,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.seiko.imageloader.rememberAsyncImagePainter
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.client.entities.Community
 import io.github.mmauro94.common.client.entities.PostMediaInfo
 import io.github.mmauro94.common.client.entities.PostView
+import io.github.mmauro94.common.ui.components.LoadableImage
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
@@ -130,12 +131,10 @@ fun PostHeader(postView: PostView) {
                     shape = MaterialTheme.shapes.extraSmall,
                 ) {
                     if (postView.post.thumbnailUrl != null) {
-                        val painter = rememberAsyncImagePainter(postView.post.thumbnailUrl.toString())
-                        Image(
-                            painter = painter,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.Crop,
+                        LoadableImage(
+                            Modifier.fillMaxSize(),
+                            Modifier.fillMaxSize(),
+                            postView.post.thumbnailUrl,
                         )
                     } else {
                         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) {
@@ -173,14 +172,10 @@ fun ColumnScope.PostContent(postView: PostView, enableBodyClicks: Boolean, maxBo
         null -> {}
         is PostMediaInfo.Image -> {
             Spacer(Modifier.height(16.dp))
-            val painter = rememberAsyncImagePainter(mediaInfo.thumbnailUrl.toString())
-            // TODO handle image loading (now height is at 0)
-            // TODO handle image download errors
-            // TODO seems to not work with webp
-            Image(
-                painter = painter,
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
+            LoadableImage(
+                Modifier.fillMaxWidth(),
+                Modifier.fillMaxWidth().aspectRatio(16f / 9f),
+                image = mediaInfo.thumbnailUrl,
                 contentScale = ContentScale.FillWidth,
             )
         }

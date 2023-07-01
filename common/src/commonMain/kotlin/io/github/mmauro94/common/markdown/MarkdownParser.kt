@@ -13,6 +13,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import io.ktor.http.URLParserException
+import io.ktor.http.Url
 import org.commonmark.Extension
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
@@ -207,7 +209,10 @@ private class MarkdownParser(
     }
 
     override fun visit(image: Image) {
-        addElement(MarkdownElement.Image(image.destination, image.title))
+        try {
+            addElement(MarkdownElement.Image(Url(image.destination), image.title))
+        } catch (ignored: URLParserException) {
+        }
     }
 
     override fun visit(indentedCodeBlock: IndentedCodeBlock) {

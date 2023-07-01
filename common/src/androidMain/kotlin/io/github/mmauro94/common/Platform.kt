@@ -1,7 +1,5 @@
 package io.github.mmauro94.common
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyListState
@@ -55,15 +53,5 @@ actual fun appColorScheme(): ColorScheme {
         dynamicDarkColorScheme(LocalContext.current)
     } else {
         darkColorScheme()
-    }
-}
-
-@Composable
-actual fun UrlOpener(url: String, content: @Composable (openUrl: () -> Unit) -> Unit) {
-    val ctx = LocalContext.current
-    content {
-        val i = Intent(Intent.ACTION_VIEW)
-        i.setData(Uri.parse(url))
-        ctx.startActivity(i)
     }
 }

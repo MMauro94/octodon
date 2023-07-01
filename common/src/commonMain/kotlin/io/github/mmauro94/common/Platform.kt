@@ -24,6 +24,3 @@ expect fun generateImageLoader(): ImageLoader
 
 @Composable
 expect fun appColorScheme(): ColorScheme
-
-@Composable
-expect fun UrlOpener(url: String, content: @Composable (openUrl: () -> Unit) -> Unit)

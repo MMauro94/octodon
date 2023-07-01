@@ -12,13 +12,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Divider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberAsyncImagePainter
@@ -26,26 +32,28 @@ import com.seiko.imageloader.rememberAsyncImagePainter
 @Composable
 fun ReadOnlyMarkdown(
     markdown: String,
+    enableClicks: Boolean,
 ) {
     val ast = parse(markdown)
-    ReadOnlyMarkdown(ast)
+    ReadOnlyMarkdown(ast, enableClicks)
 }
 
 @Composable
 fun ReadOnlyMarkdown(
     markdownElements: List<MarkdownElement>,
+    enableClicks: Boolean,
 ) {
     Column {
         markdownElements.forEach { element ->
             when (element) {
                 is MarkdownElement.Text -> {
-                    Text(element.text, style = element.style)
+                    DefaultClickableText(element.text, style = element.style, enabled = enableClicks)
                 }
 
                 is MarkdownElement.Quote -> {
                     Row(Modifier.height(IntrinsicSize.Min)) {
                         Box(Modifier.fillMaxHeight().width(12.dp).padding(horizontal = 4.dp).background(MaterialTheme.colorScheme.primary))
-                        ReadOnlyMarkdown(element.content)
+                        ReadOnlyMarkdown(element.content, enableClicks)
                     }
                 }
 
@@ -64,7 +72,7 @@ fun ReadOnlyMarkdown(
                     Row {
                         Spacer(Modifier.width(8.dp))
                         Text(element.bullet, style = MaterialTheme.typography.bodyMedium)
-                        ReadOnlyMarkdown(element.content)
+                        ReadOnlyMarkdown(element.content, enableClicks)
                     }
                 }
 
@@ -98,5 +106,30 @@ fun ReadOnlyMarkdown(
                 }
             }
         }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalTextApi::class)
+private fun DefaultClickableText(
+    text: AnnotatedString,
+    style: TextStyle,
+    enabled: Boolean,
+) {
+    if (!enabled) {
+        Text(text, style = style)
+    } else {
+        val uriHandler = LocalUriHandler.current
+        ClickableText(
+            text,
+            style = style.merge(TextStyle(color = LocalContentColor.current)),
+            onClick = { pos ->
+                text
+                    .getUrlAnnotations(pos, pos)
+                    .firstOrNull()?.let { urlAnnotation ->
+                        uriHandler.openUri(urlAnnotation.item.url)
+                    }
+            },
+        )
     }
 }

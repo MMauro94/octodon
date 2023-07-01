@@ -15,6 +15,7 @@ import io.github.mmauro94.common.ui.components.MaxHeightBox
 fun PostBody(
     modifier: Modifier,
     body: String,
+    enableClicks: Boolean,
     maxHeight: Dp? = null,
 ) {
     Surface(
@@ -24,7 +25,7 @@ fun PostBody(
     ) {
         MaxHeightBox(maxHeight, MaterialTheme.colorScheme.surfaceVariant) {
             Box(Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
-                ReadOnlyMarkdown(body)
+                ReadOnlyMarkdown(body, enableClicks)
             }
         }
     }

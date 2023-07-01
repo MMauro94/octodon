@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +28,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import com.seiko.imageloader.rememberAsyncImagePainter
+import io.github.mmauro94.common.ui.components.LoadableImage
 
 @Composable
 fun ReadOnlyMarkdown(
@@ -91,11 +92,10 @@ fun ReadOnlyMarkdown(
                 }
 
                 is MarkdownElement.Image -> {
-                    val painter = rememberAsyncImagePainter(element.url)
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth(),
+                    LoadableImage(
+                        Modifier.fillMaxWidth(),
+                        Modifier.fillMaxWidth().aspectRatio(16f / 9f),
+                        image = element.url,
                         contentScale = ContentScale.FillWidth,
                     )
                 }

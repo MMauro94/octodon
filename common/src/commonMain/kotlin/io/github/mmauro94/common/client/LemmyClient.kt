@@ -39,6 +39,10 @@ class LemmyClient(
         },
     )
 
+    fun checkToken(): String {
+        return checkNotNull(token) { "Must be logged in to perform this request" }
+    }
+
     @OptIn(ExperimentalSerializationApi::class)
     val ktorClient by lazy {
         HttpClient(engineFactory) {

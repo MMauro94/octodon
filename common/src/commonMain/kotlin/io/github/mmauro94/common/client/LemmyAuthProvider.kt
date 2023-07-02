@@ -16,12 +16,6 @@ class LemmyAuthProvider(private val token: String) : AuthProvider {
     override suspend fun addRequestHeaders(request: HttpRequestBuilder, authHeader: HttpAuthHeader?) {
         when (request.method) {
             HttpMethod.Get -> request.parameter("auth", token)
-            HttpMethod.Post -> {
-                val body = request.body
-                if (body is LemmyAuthRequestBody) {
-                    body.auth = token
-                }
-            }
         }
     }
 
@@ -33,10 +27,6 @@ class LemmyAuthProvider(private val token: String) : AuthProvider {
         // Tokens cannot be refreshed, they have infinite validity
         return false
     }
-}
-
-interface LemmyAuthRequestBody {
-    var auth: String?
 }
 
 fun Auth.lemmyAuth(token: String) {

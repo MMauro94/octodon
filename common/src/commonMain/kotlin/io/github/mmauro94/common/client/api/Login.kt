@@ -6,9 +6,7 @@ import io.github.mmauro94.common.client.LemmyErrorHandler
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -19,7 +17,6 @@ suspend fun LemmyClient.login(
 ): ApiResult<LoginResponse> {
     return ApiResult(ErrorHandler) {
         ktorClient.post("user/login") {
-            contentType(ContentType.Application.Json)
             setBody(
                 LoginRequestBody(
                     usernameOrEmail = usernameOrEmail,

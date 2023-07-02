@@ -32,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,15 +43,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
+import io.github.mmauro94.common.client.api.likePost
 import io.github.mmauro94.common.client.entities.Community
 import io.github.mmauro94.common.client.entities.PostMediaInfo
+import io.github.mmauro94.common.client.entities.PostResponse
 import io.github.mmauro94.common.client.entities.PostView
 import io.github.mmauro94.common.ui.components.LoadableImage
+import io.github.mmauro94.common.utils.AsyncState
+import io.github.mmauro94.common.utils.LikeStatus
+import io.github.mmauro94.common.utils.LocalLemmyContext
+import io.github.mmauro94.common.utils.Result
+import io.github.mmauro94.common.utils.composeWorker
+import io.github.mmauro94.common.utils.process
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
 private val LATERAL_PADDING = 8.dp
@@ -59,6 +70,7 @@ private val LATERAL_PADDING = 8.dp
 fun Post(
     postView: PostView,
     onClick: (() -> Unit)?,
+    onUpdatePost: (post: PostView) -> Unit,
     openCommunity: (Community) -> Unit,
     enableBodyClicks: Boolean = false,
     maxBodyHeight: Dp? = 128.dp,
@@ -70,7 +82,7 @@ fun Post(
             Column(modifier.padding(top = 8.dp)) {
                 PostHeader(postView, openCommunity)
                 PostContent(postView, maxBodyHeight = maxBodyHeight, enableBodyClicks = enableBodyClicks)
-                PostFooter(postView)
+                PostFooter(postView, onUpdatePost)
             }
         }
     }
@@ -196,28 +208,28 @@ fun ColumnScope.PostContent(postView: PostView, enableBodyClicks: Boolean, maxBo
     }
 }
 
+private val footerIconColor
+    @Composable
+    get() = MaterialTheme.colorScheme.onSurfaceLowlighted
+
 @Composable
-fun PostFooter(postView: PostView) {
-    val color = MaterialTheme.colorScheme.onSurfaceLowlighted
+fun PostFooter(
+    postView: PostView,
+    onUpdatePost: (post: PostView) -> Unit,
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.ModeComment, stringResource(MR.strings.comments), tint = color, modifier = Modifier.size(16.dp))
+            Icon(Icons.Outlined.ModeComment, stringResource(MR.strings.comments), tint = footerIconColor, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(4.dp))
             Text(
                 text = "${postView.counts.comments} comments", // TODO
                 style = MaterialTheme.typography.labelLarge,
-                color = color,
+                color = footerIconColor,
             )
         }
 
         Spacer(Modifier.weight(1f))
-        FooterIcon({}, icon = Icons.Default.ArrowUpward, stringResource(MR.strings.upvote_action))
-        Text(
-            text = (postView.counts.upvotes - postView.counts.downvotes).toString(),
-            style = MaterialTheme.typography.labelLarge,
-            color = color,
-        )
-        FooterIcon({}, icon = Icons.Default.ArrowDownward, stringResource(MR.strings.downvote_action))
+        FooterVoteIcons(postView, onUpdatePost)
         FooterIcon({}, icon = Icons.Default.BookmarkBorder, stringResource(MR.strings.save_action))
         if (postView.post.url != null) {
             val uriHandler = LocalUriHandler.current
@@ -236,13 +248,59 @@ private fun FooterIcon(
     onClick: () -> Unit,
     icon: ImageVector,
     contentDescription: String,
+    enabled: Boolean = true,
+    highlighted: Boolean = false,
 ) {
-    IconButton(onClick = onClick, modifier = Modifier.size(44.dp)) {
+    IconButton(onClick = onClick, modifier = Modifier.size(44.dp), enabled = enabled) {
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.onSurfaceLowlighted,
+            tint = if (highlighted) MaterialTheme.colorScheme.primary else footerIconColor,
             modifier = Modifier.size(22.dp),
         )
     }
+}
+
+@Composable
+private fun FooterVoteIcons(
+    postView: PostView,
+    onUpdatePost: (post: PostView) -> Unit,
+) {
+    val cs = rememberCoroutineScope()
+    val lemmyContext = LocalLemmyContext.current
+    val (asyncState, workerChannel) = composeWorker<LikeStatus, PostResponse, StringResource>(
+        process = { status ->
+            when (val result = lemmyContext.client.likePost(postView.post.id, status)) {
+                is Result.Success -> result
+                is Result.Error -> Result.Error(MR.strings.connection_error)
+            }
+        },
+        onSuccess = { _, postResponse ->
+            onUpdatePost(postResponse.postView)
+        },
+        onError = { _, _ ->
+            // TODO give feedback with snackbar
+        },
+    )
+    val likeStatus = remember(postView.myVote) { LikeStatus.fromScore(postView.myVote) }
+
+    FooterIcon(
+        onClick = { cs.launch { workerChannel.process(likeStatus.computeNewStatus(LikeStatus.UPVOTED)) } },
+        icon = Icons.Default.ArrowUpward,
+        contentDescription = stringResource(MR.strings.upvote_action),
+        enabled = asyncState !is AsyncState.Loading,
+        highlighted = likeStatus == LikeStatus.UPVOTED,
+    )
+    Text(
+        text = (postView.counts.upvotes - postView.counts.downvotes).toString(),
+        style = MaterialTheme.typography.labelLarge,
+        color = footerIconColor,
+    )
+    FooterIcon(
+        onClick = { cs.launch { workerChannel.process(likeStatus.computeNewStatus(LikeStatus.DOWNVOTED)) } },
+        icon = Icons.Default.ArrowDownward,
+        contentDescription = stringResource(MR.strings.downvote_action),
+        enabled = asyncState !is AsyncState.Loading,
+        highlighted = likeStatus == LikeStatus.DOWNVOTED,
+    )
 }

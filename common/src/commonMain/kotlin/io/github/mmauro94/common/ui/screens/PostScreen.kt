@@ -46,6 +46,7 @@ fun PostScreen(
                 Post(
                     destination.post,
                     onClick = null,
+                    onUpdatePost = { destination.post = it },
                     openCommunity = openCommunity,
                     maxBodyHeight = null,
                     enableBodyClicks = true,

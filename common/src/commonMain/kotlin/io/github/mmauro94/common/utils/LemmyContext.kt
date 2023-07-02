@@ -7,7 +7,7 @@ import io.github.mmauro94.octodon.common.db.ServerLogin
 class LemmyContext(
     val serverLogin: ServerLogin,
 ) {
-    val client: LemmyClient = LemmyClient(serverLogin.serverUrl)
+    val client: LemmyClient = LemmyClient(serverLogin.serverUrl, serverLogin.token)
 }
 
 val LocalLemmyContext = staticCompositionLocalOf<LemmyContext> {

@@ -32,8 +32,9 @@ import io.github.mmauro94.common.client.api.GetSiteResponse
 import io.github.mmauro94.common.client.api.getSite
 import io.github.mmauro94.common.utils.AsyncState
 import io.github.mmauro94.common.utils.Result
-import io.github.mmauro94.common.utils.WorkerMessage
 import io.github.mmauro94.common.utils.composeWorker
+import io.github.mmauro94.common.utils.process
+import io.github.mmauro94.common.utils.stop
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +75,7 @@ fun ChooseServer(
             value = serverUrl,
             onValueChange = {
                 serverUrl = it
-                cs.launch { workerChannel.send(WorkerMessage.Stop) }
+                cs.launch { workerChannel.stop() }
             },
             leadingIcon = { Icon(Icons.Default.Dns, null) },
             label = { Text(stringResource(MR.strings.server_url)) },
@@ -92,7 +93,7 @@ fun ChooseServer(
             keyboardActions = KeyboardActions(
                 onAny = {
                     this.defaultKeyboardAction(ImeAction.Done)
-                    cs.launch { workerChannel.send(WorkerMessage.Process(client)) }
+                    cs.launch { workerChannel.process(client) }
                 },
             ),
         )

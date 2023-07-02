@@ -41,8 +41,9 @@ import io.github.mmauro94.common.client.api.LoginResponse
 import io.github.mmauro94.common.client.api.login
 import io.github.mmauro94.common.utils.AsyncState
 import io.github.mmauro94.common.utils.Result
-import io.github.mmauro94.common.utils.WorkerMessage
 import io.github.mmauro94.common.utils.composeWorker
+import io.github.mmauro94.common.utils.process
+import io.github.mmauro94.common.utils.stop
 import kotlinx.coroutines.launch
 
 private data class LogInInfo(
@@ -98,7 +99,7 @@ fun LogIn(
             value = usernameOrEmail,
             onValueChange = {
                 usernameOrEmail = it
-                cs.launch { workerChannel.send(WorkerMessage.Stop) }
+                cs.launch { workerChannel.stop() }
             },
             leadingIcon = { Icon(Icons.Default.Person, null) },
             label = { Text(stringResource(MR.strings.username_or_email)) },
@@ -112,7 +113,7 @@ fun LogIn(
             value = password,
             onValueChange = {
                 password = it
-                cs.launch { workerChannel.send(WorkerMessage.Stop) }
+                cs.launch { workerChannel.stop() }
             },
             leadingIcon = { Icon(Icons.Default.Password, null) },
             label = { Text(stringResource(MR.strings.password)) },
@@ -142,7 +143,7 @@ fun LogIn(
             keyboardActions = KeyboardActions(
                 onAny = {
                     this.defaultKeyboardAction(ImeAction.Done)
-                    cs.launch { workerChannel.send(WorkerMessage.Process(LogInInfo(usernameOrEmail, password, null))) }
+                    cs.launch { workerChannel.process(LogInInfo(usernameOrEmail, password, null)) }
                 },
             ),
             textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace),

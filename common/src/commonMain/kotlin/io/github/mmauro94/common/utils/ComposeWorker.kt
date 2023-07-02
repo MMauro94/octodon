@@ -32,6 +32,7 @@ fun <I, R, E> composeWorker(
                             state = AsyncState.Error(result.error)
                             onError(message.input, result.error)
                         }
+
                         is Result.Success -> {
                             state = AsyncState.Success(result.result)
                             onSuccess(message.input, result.result)
@@ -56,4 +57,12 @@ sealed interface AsyncState<out O, out E> {
 sealed interface WorkerMessage<out I> {
     object Stop : WorkerMessage<Nothing>
     data class Process<I>(val input: I) : WorkerMessage<I>
+}
+
+suspend fun <I> Channel<WorkerMessage<I>>.process(input: I) {
+    send(WorkerMessage.Process(input))
+}
+
+suspend fun <I> Channel<WorkerMessage<I>>.stop() {
+    send(WorkerMessage.Stop)
 }

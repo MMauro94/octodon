@@ -37,6 +37,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.utils.AsyncState
 import io.github.mmauro94.common.utils.WorkerMessage
+import io.github.mmauro94.common.utils.process
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
@@ -125,13 +126,13 @@ internal fun <T> ActionButton(
             when (ws) {
                 AsyncState.Loading -> CircularProgressIndicator()
                 is AsyncState.Error -> {
-                    Button({ cs.launch { workerChannel.send(WorkerMessage.Process(inputs())) } }) {
+                    Button({ cs.launch { workerChannel.process(inputs()) } }) {
                         Text(stringResource(MR.strings.retry))
                     }
                 }
 
                 else -> {
-                    Button({ cs.launch { workerChannel.send(WorkerMessage.Process(inputs())) } }) {
+                    Button({ cs.launch { workerChannel.process(inputs()) } }) {
                         Text(action)
                     }
                 }

@@ -28,6 +28,7 @@ import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.ApiResult.Error
 import io.github.mmauro94.common.client.ApiResult.Success
 import io.github.mmauro94.common.client.LemmyClient
+import io.github.mmauro94.common.client.LocalLemmyClient
 import io.github.mmauro94.common.client.api.getPosts
 import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.client.entities.PostView
@@ -39,11 +40,11 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun Feed(
-    client: LemmyClient,
     feedRequest: FeedRequest,
     modifier: Modifier = Modifier,
     onPostClick: (PostView) -> Unit,
 ) {
+    val client = LocalLemmyClient.current
     val cs = rememberCoroutineScope()
     var feed by remember(client, feedRequest) { mutableStateOf(FeedInfo.DEFAULT) }
     val channel = remember(client, feedRequest) { Channel<Int>(Channel.CONFLATED) }

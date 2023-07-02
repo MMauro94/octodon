@@ -11,6 +11,8 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -42,6 +44,7 @@ class LemmyClient(
             expectSuccess = true
             defaultRequest {
                 url(this@LemmyClient.url.removeSuffix("/") + "/api/v3/")
+                contentType(ContentType.Application.Json)
             }
             install(ContentEncoding) {
                 deflate(1.0f)

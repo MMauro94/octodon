@@ -40,7 +40,12 @@ fun Feed(
         // TODO empty feed view
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 32.dp), state = feedListState) {
             items(feed.postViews) { post ->
-                Post(post, onClick = { onPostClick(post) }, openCommunity = openCommunity)
+                Post(
+                    postView = post,
+                    onClick = { onPostClick(post) },
+                    onUpdatePost = downloadableFeed::updatePost,
+                    openCommunity = openCommunity,
+                )
             }
             when (val state = feed.state) {
                 is AsyncState.Error -> item {

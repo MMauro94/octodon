@@ -16,7 +16,10 @@ enum class LikeStatus(val score: Int) {
 
     companion object {
 
-        fun fromScore(score: Int): LikeStatus {
+        fun fromScore(score: Int?): LikeStatus {
+            if (score == null) {
+                return NO_VOTE
+            }
             return LikeStatus.values().first { it.score == score }
         }
     }

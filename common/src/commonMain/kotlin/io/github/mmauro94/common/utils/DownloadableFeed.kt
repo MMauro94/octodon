@@ -44,7 +44,7 @@ class DownloadableFeed(
                 is Result.Success -> {
                     nextPage += 1
                     feed.copy(
-                        postViews = feed.postViews + posts.result,
+                        postViewsMap = feed.postViewsMap + posts.result.associateBy { it.post.id },
                         state = when {
                             posts.result.isEmpty() -> AsyncState.Success(Unit)
                             else -> AsyncState.Resting
@@ -54,16 +54,31 @@ class DownloadableFeed(
             }
         }
     }
+
+    fun updatePost(post: PostView) {
+        val id = post.post.id
+        if (id in feed.postViewsMap) {
+            feed = feed.copy(
+                postViewsMap = feed.postViewsMap.toMutableMap().apply {
+                    this[id] = post
+                },
+            )
+        } else {
+            error("Post with id $id not in feed")
+        }
+    }
 }
 
 data class FeedInfo(
-    val postViews: List<PostView>,
+    val postViewsMap: Map<Long, PostView>,
     val state: AsyncState<Unit, String>,
 ) {
 
+    val postViews = postViewsMap.values.toList()
+
     companion object {
         val DEFAULT = FeedInfo(
-            postViews = emptyList(),
+            postViewsMap = emptyMap(),
             state = AsyncState.Resting,
         )
     }

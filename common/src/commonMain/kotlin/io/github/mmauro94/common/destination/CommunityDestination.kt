@@ -1,8 +1,8 @@
 package io.github.mmauro94.common.destination
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.client.entities.SortType
@@ -12,13 +12,12 @@ import io.github.mmauro94.common.ui.FeedRequest
 import io.github.mmauro94.common.ui.screens.FeedScreen
 import io.github.mmauro94.common.utils.LemmyContext
 
-class FeedDestination(
+class CommunityDestination(
     lemmyContext: LemmyContext,
-    val type: ListingType,
-    val sort: MutableState<SortType>,
-    val communityId: Long? = null,
+    val communityId: Long,
 ) : LemmyDestination(lemmyContext) {
-    val feedRequest get() = FeedRequest(sort.value, type, communityId)
+    val sort = mutableStateOf(SortType.HOT)
+    val feedRequest get() = FeedRequest(sort.value, ListingType.ALL, communityId)
 
     @Composable
     override fun contentWithLemmyContext(
@@ -27,7 +26,7 @@ class FeedDestination(
         editStack: (editor: StackData<OctodonDestination>.() -> StackData<OctodonDestination>) -> Unit,
     ) {
         FeedScreen(
-            this,
+            feedRequest,
             state,
             onPostClick = { post ->
                 editStack {
@@ -35,6 +34,14 @@ class FeedDestination(
                 }
             },
             openDrawer = openDrawer,
+            setSort = { sort.value = it },
+            openCommunity = { community ->
+                if (community.id != communityId) {
+                    editStack {
+                        push(CommunityDestination(lemmyContext, community.id))
+                    }
+                }
+            },
         )
     }
 }

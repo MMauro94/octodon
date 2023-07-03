@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Moving
 import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material.icons.filled.Reviews
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
 import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.utils.ComposableString
@@ -20,6 +21,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 
 @Serializable
+@Immutable
 enum class SortType(val label: ComposableString, val group: Group) {
     @SerialName("Active")
     @JsonNames("active")

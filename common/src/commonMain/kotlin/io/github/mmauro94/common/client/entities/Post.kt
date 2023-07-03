@@ -1,5 +1,6 @@
 package io.github.mmauro94.common.client.entities
 
+import androidx.compose.runtime.Immutable
 import io.github.mmauro94.common.client.ParsableInstant
 import io.github.mmauro94.common.client.ParsableUrl
 import io.ktor.http.Url
@@ -8,6 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
+@Immutable
 data class Post(
     val id: Long,
     val name: String,

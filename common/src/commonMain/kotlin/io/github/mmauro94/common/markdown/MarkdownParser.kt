@@ -3,6 +3,7 @@ package io.github.mmauro94.common.markdown
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -309,7 +310,7 @@ private val parser: Parser = Parser.builder()
 
 @Composable
 fun parse(markdown: String): List<MarkdownElement> {
-    val node = parser.parse(markdown)
+    val node = remember(markdown) { parser.parse(markdown) }
     return MarkdownParser(
         markdown,
         typography = MaterialTheme.typography,

@@ -1,11 +1,13 @@
 package io.github.mmauro94.common.client.entities
 
+import androidx.compose.runtime.Immutable
 import io.github.mmauro94.common.client.ParsableInstant
 import io.github.mmauro94.common.client.ParsableUrl
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Immutable
 data class CustomEmoji(
     @SerialName("alt_text") val altText: String,
     val category: String,

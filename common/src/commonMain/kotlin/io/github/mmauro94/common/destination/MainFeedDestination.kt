@@ -1,13 +1,16 @@
 package io.github.mmauro94.common.destination
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.client.entities.SortType
 import io.github.mmauro94.common.navigation.ItemAnimatableState
 import io.github.mmauro94.common.navigation.StackData
-import io.github.mmauro94.common.ui.FeedRequest
 import io.github.mmauro94.common.ui.screens.FeedScreen
+import io.github.mmauro94.common.utils.DownloadableFeed
+import io.github.mmauro94.common.utils.FeedRequest
 import io.github.mmauro94.common.utils.LemmyContext
 
 class MainFeedDestination(
@@ -17,6 +20,8 @@ class MainFeedDestination(
     val communityId: Long? = null,
 ) : LemmyDestination(lemmyContext) {
     val feedRequest get() = FeedRequest(sort.value, type, communityId)
+    private val downloadableFeed: DownloadableFeed = DownloadableFeed(lemmyContext, feedRequest)
+    private val feedListState = LazyListState()
 
     @Composable
     override fun contentWithLemmyContext(
@@ -24,9 +29,13 @@ class MainFeedDestination(
         openDrawer: () -> Unit,
         editStack: (editor: StackData<OctodonDestination>.() -> StackData<OctodonDestination>) -> Unit,
     ) {
+        LaunchedEffect(downloadableFeed) {
+            downloadableFeed.start()
+        }
         FeedScreen(
-            feedRequest,
             state,
+            downloadableFeed = downloadableFeed,
+            feedListState = feedListState,
             onPostClick = { post ->
                 editStack {
                     push(PostDestination(lemmyContext, post))
@@ -34,11 +43,10 @@ class MainFeedDestination(
             },
             openDrawer = openDrawer,
             setSort = { sort.value = it },
-            openCommunity = { community ->
-                editStack {
-                    push(CommunityDestination(lemmyContext, community.id))
-                }
-            },
-        )
+        ) { community ->
+            editStack {
+                push(CommunityDestination(lemmyContext, community.id))
+            }
+        }
     }
 }

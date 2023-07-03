@@ -15,9 +15,9 @@ data class LazyAnnotatedString(
 ) {
     @Composable
     fun toAnnotatedString(): AnnotatedString {
-        return if(links.isEmpty() && codeBlocks.isEmpty()){
+        return if (links.isEmpty() && codeBlocks.isEmpty()) {
             baseString
-        }else {
+        } else {
             AnnotatedString.Builder(baseString.length).apply {
                 append(baseString)
                 links.forEach {

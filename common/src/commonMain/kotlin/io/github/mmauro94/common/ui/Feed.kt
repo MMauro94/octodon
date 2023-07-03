@@ -28,11 +28,11 @@ import io.github.mmauro94.common.client.ApiResult
 import io.github.mmauro94.common.client.ApiResult.Error
 import io.github.mmauro94.common.client.ApiResult.Success
 import io.github.mmauro94.common.client.LemmyClient
-import io.github.mmauro94.common.client.LocalLemmyClient
 import io.github.mmauro94.common.client.api.getPosts
 import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.client.entities.PostView
 import io.github.mmauro94.common.client.entities.SortType
+import io.github.mmauro94.common.utils.LocalLemmyContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -44,16 +44,16 @@ fun Feed(
     modifier: Modifier = Modifier,
     onPostClick: (PostView) -> Unit,
 ) {
-    val client = LocalLemmyClient.current
+    val context = LocalLemmyContext.current
     val cs = rememberCoroutineScope()
-    var feed by remember(client, feedRequest) { mutableStateOf(FeedInfo.DEFAULT) }
-    val channel = remember(client, feedRequest) { Channel<Int>(Channel.CONFLATED) }
+    var feed by remember(context, feedRequest) { mutableStateOf(FeedInfo.DEFAULT) }
+    val channel = remember(context, feedRequest) { Channel<Int>(Channel.CONFLATED) }
     val lazyColumnState = rememberLazyListState()
-    LaunchedEffect(client, feedRequest) {
+    LaunchedEffect(context, feedRequest) {
         for (page in channel) {
             feed = feed.copy(state = FeedState.Loading(nextPage = page))
             val posts = async(Dispatchers.IO) {
-                feedRequest.getPosts(client, page)
+                feedRequest.getPosts(context.client, page)
             }.await()
             feed = when (posts) {
                 is Error -> feed.copy(

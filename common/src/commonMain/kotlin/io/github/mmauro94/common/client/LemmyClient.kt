@@ -1,6 +1,5 @@
 package io.github.mmauro94.common.client
 
-import androidx.compose.runtime.staticCompositionLocalOf
 import io.github.mmauro94.common.serializers.InstantSerializer
 import io.github.mmauro94.common.serializers.UrlSerializer
 import io.ktor.client.HttpClient
@@ -77,8 +76,4 @@ class LemmyClient(
             }
         }
     }
-}
-
-val LocalLemmyClient = staticCompositionLocalOf<LemmyClient> {
-    error("LocalLemmyClient must be explicitly initialized")
 }

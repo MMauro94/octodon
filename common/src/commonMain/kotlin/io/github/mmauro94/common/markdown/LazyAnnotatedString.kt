@@ -15,15 +15,19 @@ data class LazyAnnotatedString(
 ) {
     @Composable
     fun toAnnotatedString(): AnnotatedString {
-        return AnnotatedString.Builder(baseString.length).apply {
-            append(baseString)
-            links.forEach {
-                addStyle(SpanStyle(color = MaterialTheme.colorScheme.primary), it.first, it.last + 1)
-            }
-            codeBlocks.forEach {
-                addStyle(SpanStyle(fontFamily = FontFamily.Monospace, background = codeBackgroundColor()), it.first, it.last + 1)
-            }
-        }.toAnnotatedString()
+        return if(links.isEmpty() && codeBlocks.isEmpty()){
+            baseString
+        }else {
+            AnnotatedString.Builder(baseString.length).apply {
+                append(baseString)
+                links.forEach {
+                    addStyle(SpanStyle(color = MaterialTheme.colorScheme.primary), it.first, it.last + 1)
+                }
+                codeBlocks.forEach {
+                    addStyle(SpanStyle(fontFamily = FontFamily.Monospace, background = codeBackgroundColor()), it.first, it.last + 1)
+                }
+            }.toAnnotatedString()
+        }
     }
 
     @OptIn(ExperimentalTextApi::class)

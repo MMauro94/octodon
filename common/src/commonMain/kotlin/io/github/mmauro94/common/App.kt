@@ -33,20 +33,19 @@ import app.cash.sqldelight.coroutines.mapToList
 import com.seiko.imageloader.LocalImageLoader
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.client.entities.ListingType
-import io.github.mmauro94.common.client.entities.PostView
 import io.github.mmauro94.common.client.entities.SortType
-import io.github.mmauro94.common.navigation.NavigationDestination
+import io.github.mmauro94.common.destination.AddServerDestination
+import io.github.mmauro94.common.destination.FeedDestination
+import io.github.mmauro94.common.destination.OctodonDestination
+import io.github.mmauro94.common.navigation.ItemAnimatableState
 import io.github.mmauro94.common.navigation.StackData
 import io.github.mmauro94.common.navigation.StackNavigation
 import io.github.mmauro94.common.platform.createSqlDriver
-import io.github.mmauro94.common.ui.FeedRequest
-import io.github.mmauro94.common.ui.screens.AddServerLoginScreen
-import io.github.mmauro94.common.ui.screens.FeedScreen
-import io.github.mmauro94.common.ui.screens.PostScreen
+import io.github.mmauro94.common.utils.LemmyContext
 import io.github.mmauro94.common.utils.LocalDataDb
 import io.github.mmauro94.octodon.common.db.Data
-import io.github.mmauro94.octodon.common.db.ServerLogin
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,33 +67,22 @@ fun App() {
     }
 }
 
-sealed interface OctodonDestination : NavigationDestination {
-    class Feed(
-        val serverLogin: ServerLogin,
-        val type: ListingType,
-        val communityId: Long? = null,
-    ) : OctodonDestination {
-        var sort by mutableStateOf(SortType.HOT)
-        val feedRequest get() = FeedRequest(sort, type, communityId)
-    }
-
-    class Post(val serverLogin: ServerLogin, val post: PostView) : OctodonDestination
-
-    object AddServer : OctodonDestination
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppContent() {
     val cs = rememberCoroutineScope()
     val db = LocalDataDb.current
+    val mainFeedSort = remember { mutableStateOf(SortType.HOT) }
     val usersState by remember(db) {
-        db.serverLoginQueries.selectAll().asFlow().mapToList(Dispatchers.IO)
+        db.serverLoginQueries.selectAll().asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { logins ->
+                logins.map { login -> LemmyContext(login) }
+            }
     }.collectAsState(null)
     val users = usersState
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val openDrawerLambda: () -> Unit = { cs.launch { drawerState.open() } }
 
     if (users == null) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -107,18 +95,18 @@ private fun AppContent() {
         }
         val user = userState
         var stackData by remember {
-            mutableStateOf(StackData.of<OctodonDestination>(OctodonDestination.AddServer))
+            mutableStateOf(StackData.of<OctodonDestination>(AddServerDestination))
         }
         remember(user) {
             stackData = StackData.of(
                 if (user != null) {
-                    OctodonDestination.Feed(user, ListingType.LOCAL)
+                    FeedDestination(user, ListingType.LOCAL, mainFeedSort)
                 } else {
-                    OctodonDestination.AddServer
+                    AddServerDestination
                 },
             )
         }
-        val main = stackData.stack.firstOrNull { it is OctodonDestination.Feed } as OctodonDestination.Feed?
+        val mainFeed = stackData.stack.firstOrNull { it is FeedDestination } as FeedDestination?
 
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -128,8 +116,8 @@ private fun AppContent() {
                         NavigationDrawerItem(
                             label = {
                                 Column {
-                                    Text(u.username ?: stringResource(MR.strings.anonymous))
-                                    Text(u.serverUrl, style = MaterialTheme.typography.labelSmall)
+                                    Text(u.serverLogin.username ?: stringResource(MR.strings.anonymous))
+                                    Text(u.serverLogin.serverUrl, style = MaterialTheme.typography.labelSmall)
                                 }
                             },
                             selected = u == user,
@@ -145,26 +133,26 @@ private fun AppContent() {
                         selected = false,
                         onClick = {
                             cs.launch { drawerState.close() }
-                            stackData = stackData.push(OctodonDestination.AddServer)
+                            stackData = stackData.push(AddServerDestination)
                         },
                         icon = { Icon(Icons.Default.Add, null) },
                     )
-                    if (main != null) {
+                    if (user != null) {
                         Divider()
                         ListingType.values().forEach { listingType ->
                             NavigationDrawerItem(
                                 label = { Text(listingType.label.str()) },
-                                selected = main.feedRequest.type == listingType,
+                                selected = mainFeed?.feedRequest?.type == listingType,
                                 onClick = {
                                     cs.launch { drawerState.close() }
-                                    stackData = stackData
-                                        .popUntil(main)
-                                        .replace(
-                                            main,
-                                            OctodonDestination.Feed(main.serverLogin, listingType).apply {
-                                                sort = main.sort
-                                            },
-                                        )
+                                    val feedDestination = FeedDestination(user, listingType, mainFeedSort)
+                                    stackData = if (mainFeed != null) {
+                                        stackData
+                                            .popUntil(mainFeed)
+                                            .replace(mainFeed, feedDestination)
+                                    } else {
+                                        stackData.push(feedDestination)
+                                    }
                                 },
                                 icon = { Icon(listingType.icon, null) },
                             )
@@ -183,28 +171,12 @@ private fun AppContent() {
                         false
                     }
                 },
-            ) { location, state ->
-                when (location) {
-                    is OctodonDestination.AddServer -> AddServerLoginScreen(
-                        state,
-                        openDrawer = openDrawerLambda,
-                    )
-
-                    is OctodonDestination.Feed -> FeedScreen(
-                        location,
-                        state,
-                        onPostClick = { post ->
-                            stackData = stackData.push(OctodonDestination.Post(location.serverLogin, post))
-                        },
-                        openDrawer = openDrawerLambda,
-                    )
-
-                    is OctodonDestination.Post -> PostScreen(
-                        location,
-                        state,
-                        openDrawer = openDrawerLambda,
-                    )
-                }
+            ) { location, state: ItemAnimatableState ->
+                location.content(
+                    state = state,
+                    openDrawer = { cs.launch { drawerState.open() } },
+                    editStack = { editor -> stackData = editor(stackData) },
+                )
             }
         }
     }

@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
-import io.github.mmauro94.common.OctodonDestination
+import io.github.mmauro94.common.destination.PostDestination
 import io.github.mmauro94.common.navigation.ItemAnimatableState
 import io.github.mmauro94.common.navigation.SwipeToPopNestedScrollConnection
 import io.github.mmauro94.common.navigation.swipeToPop
@@ -19,7 +19,7 @@ import io.github.mmauro94.common.ui.Post
 
 @Composable
 fun PostScreen(
-    destination: OctodonDestination.Post,
+    destination: PostDestination,
     screenState: ItemAnimatableState,
     openDrawer: () -> Unit,
 ) {

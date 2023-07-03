@@ -37,6 +37,8 @@ import io.github.mmauro94.common.utils.process
 import io.github.mmauro94.common.utils.stop
 import kotlinx.coroutines.launch
 
+private val disallowedCharacterInUrl = "\\s+".toRegex()
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseServer(
@@ -74,7 +76,7 @@ fun ChooseServer(
             modifier = Modifier.fillMaxWidth(),
             value = serverUrl,
             onValueChange = {
-                serverUrl = it
+                serverUrl = it.replace(disallowedCharacterInUrl, "")
                 cs.launch { workerChannel.stop() }
             },
             leadingIcon = { Icon(Icons.Default.Dns, null) },

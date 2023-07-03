@@ -43,77 +43,74 @@ fun ReadOnlyMarkdown(
     enableClicks: Boolean,
 ) {
     Column {
-        ReadOnlyMarkdownElements(markdownElements, enableClicks)
+        markdownElements.forEach { element ->
+            ReadOnlyMarkdownElement(element, enableClicks)
+        }
     }
 }
 
-/**
- * Should be composed inside a Column-like layout
- */
 @Composable
-fun ReadOnlyMarkdownElements(
-    markdownElements: List<MarkdownElement>,
+fun ReadOnlyMarkdownElement(
+    element: MarkdownElement,
     enableClicks: Boolean,
 ) {
-    markdownElements.forEach { element ->
-        when (element) {
-            is MarkdownElement.Text -> {
-                DefaultClickableText(element.text.toAnnotatedString(), style = element.style.toTextStyle(), enabled = enableClicks)
-            }
+    when (element) {
+        is MarkdownElement.Text -> {
+            DefaultClickableText(element.text.toAnnotatedString(), style = element.style.toTextStyle(), enabled = enableClicks)
+        }
 
-            is MarkdownElement.Quote -> {
-                Row(Modifier.height(IntrinsicSize.Min)) {
-                    Box(Modifier.fillMaxHeight().width(12.dp).padding(horizontal = 4.dp).background(MaterialTheme.colorScheme.primary))
-                    ReadOnlyMarkdown(element.content, enableClicks)
-                }
+        is MarkdownElement.Quote -> {
+            Row(Modifier.height(IntrinsicSize.Min)) {
+                Box(Modifier.fillMaxHeight().width(12.dp).padding(horizontal = 4.dp).background(MaterialTheme.colorScheme.primary))
+                ReadOnlyMarkdown(element.content, enableClicks)
             }
+        }
 
-            is MarkdownElement.Divider -> {
-                Spacer(Modifier.height(8.dp))
-                // TODO: color
-                Divider(thickness = 2.dp, color = MaterialTheme.colorScheme.primary)
-                Spacer(Modifier.height(8.dp))
+        is MarkdownElement.Divider -> {
+            Spacer(Modifier.height(8.dp))
+            // TODO: color
+            Divider(thickness = 2.dp, color = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.height(8.dp))
+        }
+
+        is MarkdownElement.Spacer -> {
+            Spacer(Modifier.height(element.height))
+        }
+
+        is MarkdownElement.ListItem -> {
+            Row {
+                Spacer(Modifier.width(8.dp))
+                Text(element.bullet, style = MaterialTheme.typography.bodyMedium)
+                ReadOnlyMarkdown(element.content, enableClicks)
             }
+        }
 
-            is MarkdownElement.Spacer -> {
-                Spacer(Modifier.height(element.height))
-            }
-
-            is MarkdownElement.ListItem -> {
-                Row {
-                    Spacer(Modifier.width(8.dp))
-                    Text(element.bullet, style = MaterialTheme.typography.bodyMedium)
-                    ReadOnlyMarkdown(element.content, enableClicks)
-                }
-            }
-
-            is MarkdownElement.CodeBlock -> {
-                Surface(
-                    color = codeBackgroundColor(),
-                    shape = MaterialTheme.shapes.extraSmall,
-                ) {
-                    Text(
-                        element.text,
-                        modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                        fontFamily = FontFamily.Monospace,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-            }
-
-            is MarkdownElement.Image -> {
-                LoadableImage(
-                    Modifier.fillMaxWidth(),
-                    Modifier.fillMaxWidth().aspectRatio(16f / 9f),
-                    image = element.url,
-                    contentScale = ContentScale.FillWidth,
+        is MarkdownElement.CodeBlock -> {
+            Surface(
+                color = codeBackgroundColor(),
+                shape = MaterialTheme.shapes.extraSmall,
+            ) {
+                Text(
+                    element.text,
+                    modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                    fontFamily = FontFamily.Monospace,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
+        }
 
-            is MarkdownElement.Table -> {
-                // TODO
-                Text("Pretend I'm a table")
-            }
+        is MarkdownElement.Image -> {
+            LoadableImage(
+                Modifier.fillMaxWidth(),
+                Modifier.fillMaxWidth().aspectRatio(16f / 9f),
+                image = element.url,
+                contentScale = ContentScale.FillWidth,
+            )
+        }
+
+        is MarkdownElement.Table -> {
+            // TODO
+            Text("Pretend I'm a table")
         }
     }
 }

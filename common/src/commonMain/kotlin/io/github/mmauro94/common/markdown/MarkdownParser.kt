@@ -104,6 +104,8 @@ class MarkdownParser(
         }
         currentString = LazyAnnotatedString.Builder()
         currentStyle = newStyle
+        linksStack.replaceAll { _ -> 0 }
+        codeBlocksStack.replaceAll { _ -> 0 }
         stylesStack.replaceAll { (style, _) -> style to 0 }
         urlAnnotationsStack.replaceAll { (style, _) -> style to 0 }
     }

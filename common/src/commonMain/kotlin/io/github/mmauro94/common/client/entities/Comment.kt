@@ -1,5 +1,6 @@
 package io.github.mmauro94.common.client.entities
 
+import androidx.compose.runtime.Immutable
 import io.github.mmauro94.common.client.ParsableInstant
 import io.github.mmauro94.common.client.ParsableUrl
 import kotlinx.serialization.KSerializer
@@ -12,6 +13,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable
+@Immutable
 data class Comment(
     val id: Long,
     @SerialName("ap_id") val apId: ParsableUrl,
@@ -29,6 +31,7 @@ data class Comment(
 )
 
 @Serializable(CommentPath.Serializer::class)
+@Immutable
 data class CommentPath(
     val originalValue: String,
     val ids: List<Long>,

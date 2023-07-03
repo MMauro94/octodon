@@ -1,10 +1,12 @@
 package io.github.mmauro94.common.client.entities
 
+import androidx.compose.runtime.Immutable
 import io.github.mmauro94.common.client.ParsableInstant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Immutable
 data class LocalUser(
     @SerialName("accepted_application") val acceptedApplication: Boolean,
     @SerialName("default_listing_type") val defaultListingType: ListingType,

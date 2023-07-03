@@ -86,7 +86,7 @@ fun ServerOverview(
         }
         Spacer(Modifier.height(16.dp))
         // TODO: display banner
-        //Info(stringResource(MR.strings.banner), serverInfo.siteView.site.banner?.toString())
+        // Info(stringResource(MR.strings.banner), serverInfo.siteView.site.banner?.toString())
         Info(stringResource(MR.strings.description), serverInfo.siteView.site.description)
         Info(stringResource(MR.strings.sidebar), serverInfo.siteView.site.sidebar)
         Info(stringResource(MR.strings.legal_information), serverInfo.siteView.localSite.legalInformation)

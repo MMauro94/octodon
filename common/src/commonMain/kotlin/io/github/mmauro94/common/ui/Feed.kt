@@ -29,6 +29,7 @@ import io.github.mmauro94.common.client.ApiResult.Error
 import io.github.mmauro94.common.client.ApiResult.Success
 import io.github.mmauro94.common.client.LemmyClient
 import io.github.mmauro94.common.client.api.getPosts
+import io.github.mmauro94.common.client.entities.Community
 import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.client.entities.PostView
 import io.github.mmauro94.common.client.entities.SortType
@@ -43,6 +44,7 @@ fun Feed(
     feedRequest: FeedRequest,
     modifier: Modifier = Modifier,
     onPostClick: (PostView) -> Unit,
+    openCommunity: (Community) -> Unit,
 ) {
     val context = LocalLemmyContext.current
     val cs = rememberCoroutineScope()
@@ -78,7 +80,7 @@ fun Feed(
         // TODO empty feed view
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 32.dp), state = lazyColumnState) {
             items(feed.postViews) { post ->
-                Post(post, onClick = { onPostClick(post) })
+                Post(post, onClick = { onPostClick(post) }, openCommunity = openCommunity)
             }
             when (val state = feed.state) {
                 is FeedState.Error -> item {

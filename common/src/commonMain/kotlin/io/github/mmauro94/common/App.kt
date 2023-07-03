@@ -35,7 +35,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.client.entities.SortType
 import io.github.mmauro94.common.destination.AddServerDestination
-import io.github.mmauro94.common.destination.FeedDestination
+import io.github.mmauro94.common.destination.MainFeedDestination
 import io.github.mmauro94.common.destination.OctodonDestination
 import io.github.mmauro94.common.navigation.ItemAnimatableState
 import io.github.mmauro94.common.navigation.StackData
@@ -100,13 +100,13 @@ private fun AppContent() {
         remember(user) {
             stackData = StackData.of(
                 if (user != null) {
-                    FeedDestination(user, ListingType.LOCAL, mainFeedSort)
+                    MainFeedDestination(user, ListingType.LOCAL, mainFeedSort)
                 } else {
                     AddServerDestination
                 },
             )
         }
-        val mainFeed = stackData.stack.firstOrNull { it is FeedDestination } as FeedDestination?
+        val mainFeed = stackData.stack.firstOrNull { it is MainFeedDestination } as MainFeedDestination?
 
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -145,13 +145,13 @@ private fun AppContent() {
                                 selected = mainFeed?.feedRequest?.type == listingType,
                                 onClick = {
                                     cs.launch { drawerState.close() }
-                                    val feedDestination = FeedDestination(user, listingType, mainFeedSort)
+                                    val mainFeedDestination = MainFeedDestination(user, listingType, mainFeedSort)
                                     stackData = if (mainFeed != null) {
                                         stackData
                                             .popUntil(mainFeed)
-                                            .replace(mainFeed, feedDestination)
+                                            .replace(mainFeed, mainFeedDestination)
                                     } else {
-                                        stackData.push(feedDestination)
+                                        stackData.push(mainFeedDestination)
                                     }
                                 },
                                 icon = { Icon(listingType.icon, null) },

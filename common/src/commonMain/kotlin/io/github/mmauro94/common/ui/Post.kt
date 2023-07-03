@@ -59,6 +59,7 @@ private val LATERAL_PADDING = 8.dp
 fun Post(
     postView: PostView,
     onClick: (() -> Unit)?,
+    openCommunity: (Community) -> Unit,
     enableBodyClicks: Boolean = false,
     maxBodyHeight: Dp? = 128.dp,
 ) {
@@ -67,7 +68,7 @@ fun Post(
             var modifier: Modifier = Modifier
             if (onClick != null) modifier = modifier.clickable(onClick = onClick)
             Column(modifier.padding(top = 8.dp)) {
-                PostHeader(postView)
+                PostHeader(postView, openCommunity)
                 PostContent(postView, maxBodyHeight = maxBodyHeight, enableBodyClicks = enableBodyClicks)
                 PostFooter(postView)
             }
@@ -76,10 +77,13 @@ fun Post(
 }
 
 @Composable
-fun PostHeader(postView: PostView) {
+fun PostHeader(
+    postView: PostView,
+    openCommunity: (Community) -> Unit,
+) {
     Column(Modifier.padding(horizontal = LATERAL_PADDING)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            CommunityInfo(postView.community)
+            CommunityInfo(postView.community, openCommunity)
             var now by remember { mutableStateOf(Clock.System.now()) }
             LaunchedEffect(Unit) {
                 while (true) {
@@ -154,6 +158,7 @@ fun PostHeader(postView: PostView) {
 @Composable
 fun CommunityInfo(
     community: Community,
+    openCommunity: (Community) -> Unit,
 ) {
     Text(
         text = community.name,
@@ -162,6 +167,7 @@ fun CommunityInfo(
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.secondary,
         overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.clickable { openCommunity(community) },
     )
 }
 

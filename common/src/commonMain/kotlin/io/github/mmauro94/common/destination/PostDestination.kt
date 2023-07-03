@@ -19,6 +19,11 @@ class PostDestination(lemmyContext: LemmyContext, val post: PostView) : LemmyDes
             this,
             state,
             openDrawer = openDrawer,
+            openCommunity = { community ->
+                editStack {
+                    push(CommunityDestination(lemmyContext, community.id))
+                }
+            },
         )
     }
 }

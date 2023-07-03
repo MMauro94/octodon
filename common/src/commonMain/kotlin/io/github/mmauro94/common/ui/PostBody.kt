@@ -10,14 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.mmauro94.common.markdown.Markdown
 import io.github.mmauro94.common.markdown.ReadOnlyMarkdownElements
-import io.github.mmauro94.common.markdown.parse
 import io.github.mmauro94.common.ui.components.HeightLimitedColumn
 
 @Composable
 fun PostBody(
     modifier: Modifier,
-    body: String,
+    body: Markdown,
     enableClicks: Boolean,
     maxHeight: Dp? = null,
 ) {
@@ -29,8 +29,7 @@ fun PostBody(
         Box(Modifier.padding(horizontal = 4.dp)) {
             HeightLimitedColumn(maxHeight, MaterialTheme.colorScheme.surfaceVariant) {
                 Spacer(Modifier.height(8.dp))
-                val ast = parse(body)
-                ReadOnlyMarkdownElements(ast, enableClicks)
+                ReadOnlyMarkdownElements(body.elements, enableClicks)
                 Spacer(Modifier.height(8.dp))
             }
         }

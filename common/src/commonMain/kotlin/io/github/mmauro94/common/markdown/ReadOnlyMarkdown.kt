@@ -1,6 +1,5 @@
 package io.github.mmauro94.common.markdown
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,11 +31,10 @@ import io.github.mmauro94.common.ui.components.LoadableImage
 
 @Composable
 fun ReadOnlyMarkdown(
-    markdown: String,
+    markdown: Markdown,
     enableClicks: Boolean,
 ) {
-    val ast = parse(markdown)
-    ReadOnlyMarkdown(ast, enableClicks)
+    ReadOnlyMarkdown(markdown.elements, enableClicks)
 }
 
 @Composable
@@ -49,6 +47,9 @@ fun ReadOnlyMarkdown(
     }
 }
 
+/**
+ * Should be composed inside a Column-like layout
+ */
 @Composable
 fun ReadOnlyMarkdownElements(
     markdownElements: List<MarkdownElement>,
@@ -57,7 +58,7 @@ fun ReadOnlyMarkdownElements(
     markdownElements.forEach { element ->
         when (element) {
             is MarkdownElement.Text -> {
-                DefaultClickableText(element.text, style = element.style, enabled = enableClicks)
+                DefaultClickableText(element.text.toAnnotatedString(), style = element.style.toTextStyle(), enabled = enableClicks)
             }
 
             is MarkdownElement.Quote -> {

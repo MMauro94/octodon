@@ -2,6 +2,7 @@ package io.github.mmauro94.common.client.entities
 
 import androidx.compose.runtime.Immutable
 import io.github.mmauro94.common.client.ParsableInstant
+import io.github.mmauro94.common.client.ParsableMarkdown
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -22,7 +23,7 @@ data class LocalSite(
     @SerialName("federation_enabled") val federationEnabled: Boolean,
     @SerialName("federation_worker_count") val federationWorkerCount: Int?,
     @SerialName("hide_modlog_mod_names") val hideModlogModNames: Boolean,
-    @SerialName("legal_information") val legalInformation: String?,
+    @SerialName("legal_information") val legalInformation: ParsableMarkdown?,
     @SerialName("private_instance") val privateInstance: Boolean,
     val published: ParsableInstant,
     @SerialName("registration_mode") val registrationMode: RegistrationMode,

@@ -1,27 +1,13 @@
 package io.github.mmauro94.common.markdown
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.UrlAnnotation
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.ktor.http.URLParserException
 import io.ktor.http.Url
-import org.commonmark.Extension
-import org.commonmark.ext.autolink.AutolinkExtension
-import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
-import org.commonmark.ext.gfm.tables.TablesExtension
-import org.commonmark.ext.image.attributes.ImageAttributesExtension
-import org.commonmark.ext.task.list.items.TaskListItemsExtension
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
@@ -46,31 +32,49 @@ import org.commonmark.node.SoftLineBreak
 import org.commonmark.node.StrongEmphasis
 import org.commonmark.node.Text
 import org.commonmark.node.ThematicBreak
-import org.commonmark.parser.Parser
+
+private typealias StartIndex = Int
 
 @Suppress("TooManyFunctions")
 @OptIn(ExperimentalTextApi::class)
-private class MarkdownParser(
+class MarkdownParser(
     val plainText: String,
-    val typography: Typography,
-    val codeBackground: Color,
-    val linkColor: Color,
     val addDecorativeSpaces: Boolean = true,
 ) : AbstractVisitor() {
 
     private val elements = mutableListOf<MarkdownElement>()
-    private val stylesStack = mutableListOf<Pair<SpanStyle, Int>>()
-    private val urlAnnotationsStack = mutableListOf<Pair<UrlAnnotation, Int>>()
-    private var currentString: AnnotatedString.Builder = AnnotatedString.Builder()
-    private var currentStyle: TextStyle = typography.bodyMedium
+    private val linksStack = mutableListOf<StartIndex>()
+    private val codeBlocksStack = mutableListOf<StartIndex>()
+    private val stylesStack = mutableListOf<Pair<SpanStyle, StartIndex>>()
+    private val urlAnnotationsStack = mutableListOf<Pair<UrlAnnotation, StartIndex>>()
+    private var currentString = LazyAnnotatedString.Builder()
+    private var currentStyle: MarkdownTextType = MarkdownTextType.Body
+
+    private fun pushLink() {
+        linksStack.add(currentString.length)
+    }
+
+    private fun popLink() {
+        val start = linksStack.removeLast()
+        currentString.addLink(start, currentString.length)
+    }
+
+    private fun pushCodeBlock() {
+        codeBlocksStack.add(currentString.length)
+    }
+
+    private fun popCodeBlock() {
+        val start = codeBlocksStack.removeLast()
+        currentString.addCodeBlock(start, currentString.length)
+    }
 
     private fun pushStyle(style: SpanStyle) {
         stylesStack.add(style to currentString.length)
     }
 
     private fun popStyle() {
-        val (style, actualStart) = stylesStack.removeLast()
-        currentString.addStyle(style, actualStart, currentString.length)
+        val (style, start) = stylesStack.removeLast()
+        currentString.addStyle(style, start, currentString.length)
     }
 
     private fun pushUrlAnnotation(annotation: UrlAnnotation) {
@@ -78,23 +82,27 @@ private class MarkdownParser(
     }
 
     private fun popUrlAnnotation() {
-        val (style, actualStart) = urlAnnotationsStack.removeLast()
-        currentString.addUrlAnnotation(style, actualStart, currentString.length)
+        val (url, start) = urlAnnotationsStack.removeLast()
+        currentString.addUrlAnnotation(url, start, currentString.length)
     }
 
-    private fun commitString(newStyle: TextStyle = typography.bodyMedium) {
+    private fun commitString(newStyle: MarkdownTextType = MarkdownTextType.Body) {
         if (currentString.length > 0) {
+            linksStack.forEach { start ->
+                currentString.addLink(start, currentString.length)
+            }
+            codeBlocksStack.forEach { start ->
+                currentString.addCodeBlock(start, currentString.length)
+            }
             stylesStack.forEach { (style, start) ->
                 currentString.addStyle(style, start, currentString.length)
             }
             urlAnnotationsStack.forEach { (url, start) ->
                 currentString.addUrlAnnotation(url, start, currentString.length)
             }
-            elements.add(
-                MarkdownElement.Text(currentString.toAnnotatedString(), currentStyle),
-            )
+            elements.add(MarkdownElement.Text(currentString.build(), currentStyle))
         }
-        currentString = AnnotatedString.Builder()
+        currentString = LazyAnnotatedString.Builder()
         currentStyle = newStyle
         stylesStack.replaceAll { (style, _) -> style to 0 }
         urlAnnotationsStack.replaceAll { (style, _) -> style to 0 }
@@ -132,8 +140,7 @@ private class MarkdownParser(
         andNext: Boolean = true,
         addDecorativeSpaces: Boolean = this.addDecorativeSpaces,
     ): List<MarkdownElement> {
-        return MarkdownParser(plainText, typography, codeBackground, linkColor, addDecorativeSpaces)
-            .parse(node, andNext = andNext)
+        return MarkdownParser(plainText, addDecorativeSpaces).parse(node, andNext = andNext)
     }
 
     override fun visit(blockQuote: BlockQuote) {
@@ -144,9 +151,9 @@ private class MarkdownParser(
     }
 
     override fun visit(code: Code) {
-        pushStyle(SpanStyle(fontFamily = FontFamily.Monospace, background = codeBackground))
+        pushCodeBlock()
         addText(code.literal)
-        popStyle()
+        popCodeBlock()
     }
 
     override fun visit(emphasis: Emphasis) {
@@ -175,14 +182,14 @@ private class MarkdownParser(
             ),
         )
         val style = when (heading.level) {
-            1 -> typography.headlineLarge
-            2 -> typography.headlineMedium
-            3 -> typography.headlineSmall
-            4 -> typography.titleLarge
-            5 -> typography.titleMedium
-            6 -> typography.titleSmall
-            7 -> typography.bodyLarge
-            else -> typography.bodyMedium
+            1 -> MarkdownTextType.H1
+            2 -> MarkdownTextType.H2
+            3 -> MarkdownTextType.H3
+            4 -> MarkdownTextType.H4
+            5 -> MarkdownTextType.H5
+            6 -> MarkdownTextType.H6
+            7 -> MarkdownTextType.H7
+            else -> MarkdownTextType.Body
         }
         commitString(style)
         super.visit(heading)
@@ -222,11 +229,11 @@ private class MarkdownParser(
     }
 
     override fun visit(link: Link) {
-        pushStyle(SpanStyle(color = linkColor))
+        pushLink()
         pushUrlAnnotation(UrlAnnotation(link.destination))
         super.visit(link)
         popUrlAnnotation()
-        popStyle()
+        popLink()
     }
 
     override fun visit(bulletList: BulletList) {
@@ -295,26 +302,4 @@ private class MarkdownParser(
     override fun visit(customNode: CustomNode) {
         super.visit(customNode)
     }
-}
-
-private val extensions: List<Extension> = listOf(
-    TablesExtension.create(),
-    AutolinkExtension.create(),
-    StrikethroughExtension.create(),
-    ImageAttributesExtension.create(),
-    TaskListItemsExtension.create(),
-)
-private val parser: Parser = Parser.builder()
-    .extensions(extensions)
-    .build()
-
-@Composable
-fun parse(markdown: String): List<MarkdownElement> {
-    val node = remember(markdown) { parser.parse(markdown) }
-    return MarkdownParser(
-        markdown,
-        typography = MaterialTheme.typography,
-        codeBackground = codeBackgroundColor(),
-        linkColor = MaterialTheme.colorScheme.primary,
-    ).parse(node)
 }

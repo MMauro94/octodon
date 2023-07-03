@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.client.api.GetSiteResponse
+import io.github.mmauro94.common.markdown.Markdown
 import io.github.mmauro94.common.markdown.ReadOnlyMarkdown
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -84,7 +85,8 @@ fun ServerOverview(
             )
         }
         Spacer(Modifier.height(16.dp))
-        Info(stringResource(MR.strings.banner), serverInfo.siteView.site.banner?.toString()) // TODO
+        // TODO: display banner
+        //Info(stringResource(MR.strings.banner), serverInfo.siteView.site.banner?.toString())
         Info(stringResource(MR.strings.description), serverInfo.siteView.site.description)
         Info(stringResource(MR.strings.sidebar), serverInfo.siteView.site.sidebar)
         Info(stringResource(MR.strings.legal_information), serverInfo.siteView.localSite.legalInformation)
@@ -129,8 +131,8 @@ private fun Tag(
 }
 
 @Composable
-private fun ColumnScope.Info(title: String, content: String?) {
-    if (content != null) {
+private fun ColumnScope.Info(title: String, content: Markdown?) {
+    if (content != null && !content.isBlank()) {
         val modifier = Modifier.align(Alignment.Start)
         Text(title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, modifier = modifier)
         Spacer(Modifier.height(8.dp))

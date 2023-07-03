@@ -179,7 +179,7 @@ fun ColumnScope.PostContent(postView: PostView, enableBodyClicks: Boolean, maxBo
             )
         }
     }
-    if (!postView.post.body.isNullOrBlank()) {
+    if (postView.post.body != null && !postView.post.body.isBlank()) {
         Spacer(Modifier.height(12.dp))
         PostBody(
             modifier = Modifier.padding(horizontal = LATERAL_PADDING).fillMaxWidth(),

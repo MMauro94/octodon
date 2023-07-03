@@ -2,6 +2,7 @@ package io.github.mmauro94.common.client.entities
 
 import androidx.compose.runtime.Immutable
 import io.github.mmauro94.common.client.ParsableInstant
+import io.github.mmauro94.common.client.ParsableMarkdown
 import io.github.mmauro94.common.client.ParsableUrl
 import io.ktor.http.Url
 import kotlinx.serialization.SerialName
@@ -14,7 +15,7 @@ data class Post(
     val id: Long,
     val name: String,
     val url: ParsableUrl?,
-    val body: String?,
+    val body: ParsableMarkdown?,
     @SerialName("creator_id") val creatorId: Long,
     @SerialName("community_id") val communityId: Long,
     val removed: Boolean,

@@ -26,7 +26,7 @@ class PostDestination(lemmyContext: LemmyContext, post: PostView) : LemmyDestina
             openDrawer = openDrawer,
             openCommunity = { community ->
                 editStack {
-                    push(CommunityDestination(lemmyContext, community.id))
+                    push(CommunityDestination(lemmyContext, community))
                 }
             },
         )

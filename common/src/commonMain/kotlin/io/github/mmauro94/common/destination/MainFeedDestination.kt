@@ -20,7 +20,7 @@ class MainFeedDestination(
     val communityId: Long? = null,
 ) : LemmyDestination(lemmyContext) {
     val feedRequest get() = FeedRequest(sort.value, type, communityId)
-    private val downloadableFeed: DownloadableFeed = DownloadableFeed(lemmyContext, feedRequest)
+    private var downloadableFeed = DownloadableFeed(lemmyContext, feedRequest)
     private val feedListState = LazyListState()
 
     @Composable
@@ -29,6 +29,9 @@ class MainFeedDestination(
         openDrawer: () -> Unit,
         editStack: (editor: StackData<OctodonDestination>.() -> StackData<OctodonDestination>) -> Unit,
     ) {
+        if (feedRequest != downloadableFeed.feedRequest) {
+            downloadableFeed = DownloadableFeed(lemmyContext, feedRequest)
+        }
         LaunchedEffect(downloadableFeed) {
             downloadableFeed.start()
         }
@@ -45,7 +48,7 @@ class MainFeedDestination(
             setSort = { sort.value = it },
         ) { community ->
             editStack {
-                push(CommunityDestination(lemmyContext, community.id))
+                push(CommunityDestination(lemmyContext, community))
             }
         }
     }

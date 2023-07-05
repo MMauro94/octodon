@@ -2,6 +2,7 @@ package io.github.mmauro94.common.client.entities
 
 import androidx.compose.runtime.Immutable
 import io.github.mmauro94.common.client.ParsableInstant
+import io.github.mmauro94.common.client.ParsableMarkdown
 import io.github.mmauro94.common.client.ParsableUrl
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -11,7 +12,8 @@ import kotlinx.serialization.Serializable
 data class Community(
     val id: Long,
     val name: String,
-    val description: String?,
+    val title: String,
+    val description: ParsableMarkdown?,
     val removed: Boolean,
     val published: ParsableInstant,
     val updated: ParsableInstant?,

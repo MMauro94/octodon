@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -31,6 +32,7 @@ fun Feed(
     downloadableFeed: DownloadableFeed,
     feedListState: LazyListState,
     modifier: Modifier = Modifier,
+    feedHeader: LazyListScope.() -> Unit = {},
     onPostClick: (PostView) -> Unit,
     openCommunity: (Community) -> Unit,
 ) {
@@ -39,6 +41,7 @@ fun Feed(
     Box(modifier) {
         // TODO empty feed view
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 32.dp), state = feedListState) {
+            feedHeader()
             items(feed.postViews) { post ->
                 Post(
                     postView = post,

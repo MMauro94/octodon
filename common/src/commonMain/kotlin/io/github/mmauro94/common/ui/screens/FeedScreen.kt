@@ -3,6 +3,7 @@ package io.github.mmauro94.common.ui.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +22,7 @@ fun FeedScreen(
     screenState: ItemAnimatableState,
     downloadableFeed: DownloadableFeed,
     feedListState: LazyListState,
+    feedHeader: LazyListScope.() -> Unit = {},
     onPostClick: (PostView) -> Unit,
     openDrawer: () -> Unit,
     setSort: (SortType) -> Unit,
@@ -42,6 +44,7 @@ fun FeedScreen(
                 downloadableFeed = downloadableFeed,
                 feedListState = feedListState,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
+                feedHeader = feedHeader,
                 onPostClick = onPostClick,
                 openCommunity = openCommunity,
             )

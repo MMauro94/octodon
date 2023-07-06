@@ -1,4 +1,5 @@
 [*.{kt,kts}]
+ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
 insert_final_newline = true
 # Must also be changed in detekt.yml/formatting rules
 max_line_length = 140

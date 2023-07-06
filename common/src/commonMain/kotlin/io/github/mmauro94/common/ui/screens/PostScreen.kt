@@ -1,9 +1,6 @@
 package io.github.mmauro94.common.ui.screens
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -17,6 +14,7 @@ import io.github.mmauro94.common.navigation.ItemAnimatableState
 import io.github.mmauro94.common.navigation.SwipeToPopNestedScrollConnection
 import io.github.mmauro94.common.navigation.swipeToPop
 import io.github.mmauro94.common.ui.Post
+import io.github.mmauro94.common.ui.components.PostComments
 
 @Composable
 fun PostScreen(
@@ -42,16 +40,19 @@ fun PostScreen(
                 height,
                 title = { Text(stringResource(MR.strings.comments)) },
             )
-            Box(Modifier.verticalScroll(rememberScrollState())) {
-                Post(
-                    destination.post,
-                    onClick = null,
-                    onUpdatePost = { destination.post = it },
-                    openCommunity = openCommunity,
-                    maxBodyHeight = null,
-                    enableBodyClicks = true,
-                )
-            }
+            PostComments(
+                postView = destination.post,
+                header = {
+                    Post(
+                        destination.post,
+                        onClick = null,
+                        onUpdatePost = { destination.post = it },
+                        openCommunity = openCommunity,
+                        maxBodyHeight = null,
+                        enableBodyClicks = true,
+                    )
+                },
+            )
         }
     }
 }

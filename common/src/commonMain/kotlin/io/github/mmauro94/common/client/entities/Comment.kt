@@ -28,7 +28,14 @@ data class Comment(
     val published: ParsableInstant,
     val removed: Boolean,
     val updated: ParsableInstant?,
-)
+) {
+
+    val parentId = path.ids.getOrNull(path.ids.size - 2)?.takeIf { it > 0 }
+
+    init {
+        require(path.ids.last() == id)
+    }
+}
 
 @Serializable(CommentPath.Serializer::class)
 @Immutable

@@ -13,6 +13,7 @@ class GetCommentsTest : FunSpec(
                 "get_comments_1",
                 "get_comments_2",
                 "get_comments_3",
+                "get_post_comments_1",
             ) { fileName ->
                 getMockedLemmyClient(fileName).getComments().shouldBeInstanceOf<Result.Success<*>>()
             }

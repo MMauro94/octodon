@@ -122,7 +122,7 @@ private fun DefaultClickableText(
     style: TextStyle,
     enabled: Boolean,
 ) {
-    if (!enabled) {
+    if (!enabled || text.getUrlAnnotations(0, text.length).isEmpty()) {
         Text(text, style = style)
     } else {
         val uriHandler = LocalUriHandler.current

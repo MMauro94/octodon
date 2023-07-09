@@ -5,4 +5,14 @@
         <item quantity="one">Top %d hour</item>
         <item quantity="other">Top %d hours</item>
     </plural>
+    <plural name="n_comments">
+        <item quantity="zero">%d comments</item>
+        <item quantity="one">%d comment</item>
+        <item quantity="other">%d comments</item>
+    </plural>
+    <plural name="n_replies">
+        <item quantity="zero">%d replies</item>
+        <item quantity="one">%d reply</item>
+        <item quantity="other">%d replies</item>
+    </plural>
 </resources>

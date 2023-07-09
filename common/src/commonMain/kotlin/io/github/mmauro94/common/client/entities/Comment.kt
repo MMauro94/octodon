@@ -2,6 +2,7 @@ package io.github.mmauro94.common.client.entities
 
 import androidx.compose.runtime.Immutable
 import io.github.mmauro94.common.client.ParsableInstant
+import io.github.mmauro94.common.client.ParsableMarkdown
 import io.github.mmauro94.common.client.ParsableUrl
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
@@ -17,7 +18,7 @@ import kotlinx.serialization.encoding.Encoder
 data class Comment(
     val id: Long,
     @SerialName("ap_id") val apId: ParsableUrl,
-    val content: String,
+    val content: ParsableMarkdown,
     @SerialName("creator_id") val creatorId: Long,
     val deleted: Boolean,
     val distinguished: Boolean,

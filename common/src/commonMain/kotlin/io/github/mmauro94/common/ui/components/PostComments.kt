@@ -16,6 +16,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.client.api.getComments
 import io.github.mmauro94.common.client.entities.CommentSortType
+import io.github.mmauro94.common.client.entities.ListingType
 import io.github.mmauro94.common.client.entities.PostView
 import io.github.mmauro94.common.utils.AsyncState
 import io.github.mmauro94.common.utils.LocalLemmyContext
@@ -41,7 +42,8 @@ fun PostComments(
                 val result = lemmyContext.client.getComments(
                     postId = input.post.id,
                     sort = CommentSortType.TOP,
-                    limit = 100,
+                    limit = 50,
+                    type = ListingType.ALL,
                 )
             ) {
                 is Result.Success -> result.map { it.toPostComments(input) }

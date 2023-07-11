@@ -51,7 +51,6 @@ class LemmyClient(
                 contentType(ContentType.Application.Json)
             }
             install(ContentEncoding) {
-                deflate(1.0f)
                 gzip(0.9f)
             }
             install(Auth) {

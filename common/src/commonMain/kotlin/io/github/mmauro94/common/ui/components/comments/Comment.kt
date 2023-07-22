@@ -1,22 +1,16 @@
-package io.github.mmauro94.common.ui.components
+package io.github.mmauro94.common.ui.components.comments
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.ModeComment
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +25,9 @@ import io.github.mmauro94.common.MR
 import io.github.mmauro94.common.client.entities.Comment
 import io.github.mmauro94.common.client.entities.CommentView
 import io.github.mmauro94.common.markdown.ReadOnlyMarkdown
+import io.github.mmauro94.common.ui.components.FooterIcon
+import io.github.mmauro94.common.ui.components.FooterLabeledIcon
+import io.github.mmauro94.common.ui.components.FooterVoteIcons
 import io.github.mmauro94.common.ui.onSurfaceLowlighted
 import io.github.mmauro94.common.utils.LikeStatus
 import io.github.mmauro94.common.utils.comments.CommentTree
@@ -38,24 +35,16 @@ import io.github.mmauro94.common.utils.relativeTimeString
 
 @Composable
 fun Comment(commentTree: CommentTree, depth: Int) {
-    val comment = commentTree.commentView.comment
-
-    Row(
-        modifier = Modifier
-            .height(IntrinsicSize.Max)
-            .fillMaxWidth()
-            .clickable { commentTree.collapsed = !commentTree.collapsed },
+    CommentContainer(
+        modifier = Modifier.clickable { commentTree.collapsed = !commentTree.collapsed },
+        depth = depth,
     ) {
-        Box(Modifier.width(4.dp * depth).fillMaxHeight().background(MaterialTheme.colorScheme.primary))
-        Box(Modifier.padding(top = 8.dp)) {
-            Column {
-                CommentHeader(commentTree.commentView)
-                CommentBody(commentTree.commentView.comment)
-                CommentFooter(commentTree.commentView)
-            }
+        Column(Modifier.padding(top = 8.dp)) {
+            CommentHeader(commentTree.commentView)
+            CommentBody(commentTree.commentView.comment)
+            CommentFooter(commentTree.commentView)
         }
     }
-    Divider()
 }
 
 @Composable

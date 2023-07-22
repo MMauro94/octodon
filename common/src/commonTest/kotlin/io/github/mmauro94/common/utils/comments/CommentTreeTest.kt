@@ -22,7 +22,7 @@ class CommentTreeTest : FunSpec(
                 check(comments is Result.Success)
 
                 val postView = mockk<PostView>()
-                val commentTree = comments.result.toPostComments(postView)
+                val commentTree = comments.result.toRoots(postView)
 
                 commentTree.postView shouldBe postView
             }

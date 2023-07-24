@@ -17,8 +17,10 @@ suspend inline fun <R : Any> ApiResult(
     return try {
         Result.Success(block())
     } catch (e: ClientRequestException) {
+        System.err.println(e)
         handleError(e, errorHandler)
     } catch (e: Exception) {
+        System.err.println(e)
         Result.Error(e)
     }
 }

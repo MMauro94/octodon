@@ -14,7 +14,7 @@ import io.github.mmauro94.common.navigation.ItemAnimatableState
 import io.github.mmauro94.common.navigation.SwipeToPopNestedScrollConnection
 import io.github.mmauro94.common.navigation.swipeToPop
 import io.github.mmauro94.common.ui.Post
-import io.github.mmauro94.common.ui.components.PostComments
+import io.github.mmauro94.common.ui.components.comments.PostComments
 
 @Composable
 fun PostScreen(

@@ -3,6 +3,7 @@
     <string name="back_action">Back</string>
     <string name="next">Next</string>
     <string name="retry">Retry</string>
+    <string name="loading___">Loading…</string>
     <string name="connection_error">Connection error</string>
 
     <string name="not_available_in_the_app_yet">Not available in the app yet</string>
@@ -70,4 +71,5 @@
     <string name="credentials_not_available_yet">Credentials not available yet</string>
     <string name="couldnt_find_username_or_email">Couldn\'t find username or email</string>
     <string name="password_incorrect">The password is incorrect</string>
+    <string name="load_more_comments">Load more comments</string>
 </resources>
